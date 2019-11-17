@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
                         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                         startActivity(intent);
                         loader.dismiss();
-                        //finish();
+                        finish();
 
                     }
                 }, 3000);
