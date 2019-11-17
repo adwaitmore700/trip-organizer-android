@@ -8,7 +8,10 @@
     <string name="et_confirm_password_placeholder">Confirm Password</string>
     <string name="btn_login_text">Login</string>
     <string name="btn_singUp_text">Sign Up</string>
+    <string name="btn_submit_text">Submit</string>
     <string name="tv_first_name_label">First Name</string>
     <string name="tv_last_name_label">Last Name</string>
     <string name="tv_gender_name_label">Gender</string>
+    <string name="db_dashboard_title">My Trips</string>
+    <string name="cr_et_enter_message_placeholder">Enter message</string>
 </resources>
