@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Trip Organizer</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="et_username_placeholder">Username</string>
+    <string name="et_password_placeholder">Password</string>
+    <string name="et_confirm_password_placeholder">Confirm Password</string>
+    <string name="btn_login_text">Login</string>
+    <string name="btn_singUp_text">Sign Up</string>
+    <string name="tv_first_name_label">First Name</string>
+    <string name="tv_last_name_label">Last Name</string>
+    <string name="tv_gender_name_label">Gender</string>
+</resources>
