@@ -4,7 +4,7 @@ import java.util.List;
 
 public class ChatRoom {
     private String TripId;
-    private String UserId;
+    private String UserId;          //need to think whether required or not
     private String Id;
     List<Message> Messages;
 

@@ -5,12 +5,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.firebase.auth.FirebaseAuth;
 import com.uncc.mad.triporganizer.R;
+import com.uncc.mad.triporganizer.interfaces.IData;
+import com.uncc.mad.triporganizer.models.ServiceHelper;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-public class TripProfileActivity extends AppCompatActivity {
+public class TripProfileActivity extends AppCompatActivity implements IData {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,4 +30,10 @@ public class TripProfileActivity extends AppCompatActivity {
                 finish();
             }
         });
-    }}
+    }
+
+    @Override
+    public void sendResponse(ServiceHelper response, String objectTypeModel) {
+
+    }
+}

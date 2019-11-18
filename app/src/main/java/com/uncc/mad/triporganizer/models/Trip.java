@@ -1,15 +1,18 @@
 package com.uncc.mad.triporganizer.models;
 
-import android.graphics.Bitmap;
+import java.util.List;
 
 public class Trip {
     private String Id;
+    private String TripCreatorUserId;
     private String Title;
-    private Bitmap CoverPhoto;
+    private String CoverPhotoUri;
     private String LocationName;
     private double LocationLatitude;
     private double LocationLongitude;
-    private com.uncc.mad.triporganizer.models.ChatRoom ChatRoom;
+    private List<TripMember> ExistingMembers;
+    private List<TripMember> DeletedMembers;
+    private ChatRoom ChatRoom;
 
     public String getId() {
         return Id;
@@ -17,6 +20,14 @@ public class Trip {
 
     public void setId(String id) {
         Id = id;
+    }
+
+    public String getTripCreatorUserId() {
+        return TripCreatorUserId;
+    }
+
+    public void setTripCreatorUserId(String tripCreatorUserId) {
+        TripCreatorUserId = tripCreatorUserId;
     }
 
     public String getTitle() {
@@ -27,12 +38,12 @@ public class Trip {
         Title = title;
     }
 
-    public Bitmap getCoverPhoto() {
-        return CoverPhoto;
+    public String getCoverPhoto() {
+        return CoverPhotoUri;
     }
 
-    public void setCoverPhoto(Bitmap coverPhoto) {
-        CoverPhoto = coverPhoto;
+    public void setCoverPhoto(String coverPhoto) {
+        CoverPhotoUri = coverPhoto;
     }
 
     public String getLocationName() {
@@ -59,11 +70,27 @@ public class Trip {
         LocationLongitude = locationLongitude;
     }
 
-    public com.uncc.mad.triporganizer.models.ChatRoom getChatRoom() {
+    public List<TripMember> getExistingMembers() {
+        return ExistingMembers;
+    }
+
+    public void setExistingMembers(List<TripMember> existingMembers) {
+        ExistingMembers = existingMembers;
+    }
+
+    public List<TripMember> getDeletedMembers() {
+        return DeletedMembers;
+    }
+
+    public void setDeletedMembers(List<TripMember> deletedMembers) {
+        DeletedMembers = deletedMembers;
+    }
+
+    public ChatRoom getChatRoom() {
         return ChatRoom;
     }
 
-    public void setChatRoom(com.uncc.mad.triporganizer.models.ChatRoom chatRoom) {
+    public void setChatRoom(ChatRoom chatRoom) {
         ChatRoom = chatRoom;
     }
 }

@@ -18,8 +18,10 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.uncc.mad.triporganizer.R;
+import com.uncc.mad.triporganizer.interfaces.IData;
+import com.uncc.mad.triporganizer.models.ServiceHelper;
 
-public class SignUpActivity extends AppCompatActivity {
+public class SignUpActivity extends AppCompatActivity implements IData {
 
     private Button signupButton;
     private FirebaseAuth mAuth;
@@ -90,4 +92,8 @@ public class SignUpActivity extends AppCompatActivity {
         return false;
     }
 
+    @Override
+    public void sendResponse(ServiceHelper response, String objectTypeModel) {
+
+    }
 }

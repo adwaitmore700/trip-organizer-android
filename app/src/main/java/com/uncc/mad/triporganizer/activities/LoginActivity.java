@@ -81,7 +81,7 @@ public class LoginActivity extends AppCompatActivity {
                                     if (task.isSuccessful()) {
                                         // Sign in success, update UI with the signed-in user's information
                                         FirebaseUser user = mAuth.getCurrentUser();
-                                        Intent intent = new Intent(LoginActivity.this, TripProfileActivity.class);
+                                        Intent intent = new Intent(LoginActivity.this, UserProfileActivity.class);
                                         startActivity(intent);
                                     } else {
                                         // If sign in fails, display a message to the user.
@@ -101,14 +101,6 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        if(currentUser !=null || account!=null){
-            Intent intent = new Intent(LoginActivity.this, TripProfileActivity.class);
-            startActivity(intent); 
-        }
-        else
-            Toast.makeText(LoginActivity.this, "Login to proceed", Toast.LENGTH_SHORT).show();
     }
 
     @Override
