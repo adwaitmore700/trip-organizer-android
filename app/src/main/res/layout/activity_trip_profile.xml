@@ -6,4 +6,19 @@
     android:layout_height="match_parent"
     tools:context=".activities.TripProfileActivity">
 
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Trip Activity"
+        tools:layout_editor_absoluteX="171dp"
+        tools:layout_editor_absoluteY="238dp" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="signout"
+        tools:layout_editor_absoluteX="156dp"
+        tools:layout_editor_absoluteY="353dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>

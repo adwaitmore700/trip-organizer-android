@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.uncc.mad.triporganizer">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -10,7 +13,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".activities.ChatRoomActivity"></activity>
+        <activity android:name=".activities.GoogleAuthActivity"></activity>
+        <activity android:name=".activities.ChatRoomActivity" />
         <activity android:name=".activities.TripProfileActivity" />
         <activity android:name=".activities.DashboardActivity" />
         <activity android:name=".activities.UserProfileActivity" />
@@ -24,8 +28,5 @@
             </intent-filter>
         </activity>
     </application>
-    <uses-permission android:name="android.permission.INTERNET" />
-
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
 </manifest>

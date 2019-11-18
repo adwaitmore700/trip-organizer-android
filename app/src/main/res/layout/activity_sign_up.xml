@@ -10,7 +10,7 @@
         android:id="@+id/sa_iv_appLogo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -62,14 +62,16 @@
         android:id="@+id/sa_btn_signUp"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="8dp"
         android:background="#00FFFFFF"
         android:text="@string/btn_singUp_text"
         android:textAllCaps="false"
         android:textColor="@color/primaryDarkColor"
         android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sa_et_confirmPassword" />
+        app:layout_constraintTop_toBottomOf="@+id/sa_et_confirmPassword"
+        app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
