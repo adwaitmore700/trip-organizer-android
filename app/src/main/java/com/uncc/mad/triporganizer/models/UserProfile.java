@@ -1,100 +1,52 @@
 package com.uncc.mad.triporganizer.models;
-
-
 //This model consists of the User Auth data along with user profile data
 
-public class UserProfile {
-    //Optional for other users, Mandatory for logged in user
-    private String Id;  //App generated id
-    private String UserId;  //Firebase generated id
-    private String Username;
-    private String EmailAddress;    //optional since username and email id would be the same
-    private String Password;
-    private String AuthToken;
+import java.io.Serializable;
 
-    private String FirstName;
-    private String LastName;
-    private int GenderId;       //optional
-    private String Gender;
-    private String ProfilePhotoUri;
-
-    public String getId() {
-        return Id;
-    }
-
-    public void setId(String id) {
-        Id = id;
-    }
-
-    public String getUserId() {
-        return UserId;
-    }
-
-    public void setUserId(String userId) {
-        UserId = userId;
-    }
-
-    public String getUsername() {
-        return Username;
-    }
-
-    public void setUsername(String username) {
-        Username = username;
-    }
-
-    public String getEmailAddress() {
-        return EmailAddress;
-    }
-
-    public void setEmailAddress(String emailAddress) {
-        EmailAddress = emailAddress;
-    }
-
-    public String getPassword() {
-        return Password;
-    }
-
-    public void setPassword(String password) {
-        Password = password;
-    }
-
-    public String getAuthToken() {
-        return AuthToken;
-    }
-
-    public void setAuthToken(String authToken) {
-        AuthToken = authToken;
-    }
+public class UserProfile implements Serializable {
+    public String firstName;
+    public String lastName;
+    public String userUID;
+    public String userGender;
+    public String imageUrl;
 
     public String getFirstName() {
-        return FirstName;
+        return firstName;
     }
 
     public void setFirstName(String firstName) {
-        FirstName = firstName;
+        this.firstName = firstName;
     }
 
     public String getLastName() {
-        return LastName;
+        return lastName;
     }
 
     public void setLastName(String lastName) {
-        LastName = lastName;
+        this.lastName = lastName;
     }
 
-    public String getGender() {
-        return Gender;
+    public String getUserUID() {
+        return userUID;
     }
 
-    public void setGender(String gender) {
-        Gender = gender;
+    public void setUserUID(String userUID) {
+        this.userUID = userUID;
     }
 
-    public String getProfilePhoto() {
-        return ProfilePhotoUri;
+    public String getUserGender() {
+        return userGender;
     }
 
-    public void setProfilePhoto(String profilePhoto) {
-        ProfilePhotoUri = profilePhoto;
+    public void setUserGender(String userGender) {
+        this.userGender = userGender;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

@@ -11,7 +11,7 @@ public class Message {
     private String ReceiverId;
     private String MessageType;
     private String MessageBody; //null if MessageType is Image
-    private String MessageAttachmentUri; //null if MessageType is Text
+    private Bitmap MessageAttachment; //null if MessageType is Text
     private Date MessageDateTime;
     private boolean MessageReadStatus;
     private boolean MessageDeliveredStatus;
@@ -64,12 +64,12 @@ public class Message {
         MessageBody = messageBody;
     }
 
-    public String getMessageAttachment() {
-        return MessageAttachmentUri;
+    public Bitmap getMessageAttachment() {
+        return MessageAttachment;
     }
 
-    public void setMessageAttachment(String messageAttachment) {
-        MessageAttachmentUri = messageAttachment;
+    public void setMessageAttachment(Bitmap messageAttachment) {
+        MessageAttachment = messageAttachment;
     }
 
     public Date getMessageDateTime() {

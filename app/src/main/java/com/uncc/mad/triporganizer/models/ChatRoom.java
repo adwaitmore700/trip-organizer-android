@@ -1,12 +1,22 @@
 package com.uncc.mad.triporganizer.models;
 
+import java.util.Date;
 import java.util.List;
 
 public class ChatRoom {
     private String TripId;
-    private String UserId;          //need to think whether required or not
-    private String Id;
-    List<Message> Messages;
+    private String UserId;
+ //   private String Id;
+    private String Messages;
+    private long time;
+
+    public long getTime() {
+        return time;
+    }
+
+    public void setTime() {
+        this.time = new Date().getTime();
+    }
 
     public String getTripId() {
         return TripId;
@@ -24,19 +34,11 @@ public class ChatRoom {
         UserId = userId;
     }
 
-    public String getId() {
-        return Id;
-    }
-
-    public void setId(String id) {
-        Id = id;
-    }
-
-    public List<Message> getMessages() {
+    public String getMessages() {
         return Messages;
     }
 
-    public void setMessages(List<Message> messages) {
+    public void setMessages(String messages) {
         Messages = messages;
     }
 }

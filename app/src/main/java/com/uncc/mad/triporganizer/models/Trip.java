@@ -1,18 +1,25 @@
 package com.uncc.mad.triporganizer.models;
 
-import java.util.List;
+import android.graphics.Bitmap;
 
 public class Trip {
     private String Id;
-    private String TripCreatorUserId;
     private String Title;
-    private String CoverPhotoUri;
-    private String LocationName;
+
+    public String getTripImageUrl() {
+        return tripImageUrl;
+    }
+
+    public void setTripImageUrl(String tripImageUrl) {
+        this.tripImageUrl = tripImageUrl;
+    }
+
+    private String tripImageUrl;
+   // private Bitmap CoverPhoto;
+   // private String LocationName;
     private double LocationLatitude;
     private double LocationLongitude;
-    private List<TripMember> ExistingMembers;
-    private List<TripMember> DeletedMembers;
-    private ChatRoom ChatRoom;
+    //private com.uncc.mad.triporganizer.models.ChatRoom ChatRoom;
 
     public String getId() {
         return Id;
@@ -22,14 +29,6 @@ public class Trip {
         Id = id;
     }
 
-    public String getTripCreatorUserId() {
-        return TripCreatorUserId;
-    }
-
-    public void setTripCreatorUserId(String tripCreatorUserId) {
-        TripCreatorUserId = tripCreatorUserId;
-    }
-
     public String getTitle() {
         return Title;
     }
@@ -37,22 +36,22 @@ public class Trip {
     public void setTitle(String title) {
         Title = title;
     }
+//
+//    public Bitmap getCoverPhoto() {
+//        return CoverPhoto;
+//    }
 
-    public String getCoverPhoto() {
-        return CoverPhotoUri;
-    }
-
-    public void setCoverPhoto(String coverPhoto) {
-        CoverPhotoUri = coverPhoto;
-    }
-
-    public String getLocationName() {
-        return LocationName;
-    }
-
-    public void setLocationName(String locationName) {
-        LocationName = locationName;
-    }
+//    public void setCoverPhoto(Bitmap coverPhoto) {
+//        CoverPhoto = coverPhoto;
+//    }
+//
+//    public String getLocationName() {
+//        return LocationName;
+//    }
+//
+//    public void setLocationName(String locationName) {
+//        LocationName = locationName;
+//    }
 
     public double getLocationLatitude() {
         return LocationLatitude;
@@ -70,27 +69,11 @@ public class Trip {
         LocationLongitude = locationLongitude;
     }
 
-    public List<TripMember> getExistingMembers() {
-        return ExistingMembers;
-    }
-
-    public void setExistingMembers(List<TripMember> existingMembers) {
-        ExistingMembers = existingMembers;
-    }
-
-    public List<TripMember> getDeletedMembers() {
-        return DeletedMembers;
-    }
-
-    public void setDeletedMembers(List<TripMember> deletedMembers) {
-        DeletedMembers = deletedMembers;
-    }
-
-    public ChatRoom getChatRoom() {
-        return ChatRoom;
-    }
-
-    public void setChatRoom(ChatRoom chatRoom) {
-        ChatRoom = chatRoom;
-    }
+//    public com.uncc.mad.triporganizer.models.ChatRoom getChatRoom() {
+//        return ChatRoom;
+//    }
+//
+//    public void setChatRoom(com.uncc.mad.triporganizer.models.ChatRoom chatRoom) {
+//        ChatRoom = chatRoom;
+//    }
 }

@@ -18,10 +18,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.uncc.mad.triporganizer.R;
-import com.uncc.mad.triporganizer.interfaces.IData;
-import com.uncc.mad.triporganizer.models.ServiceHelper;
 
-public class SignUpActivity extends AppCompatActivity implements IData {
+public class SignUpActivity extends AppCompatActivity {
 
     private Button signupButton;
     private FirebaseAuth mAuth;
@@ -37,7 +35,6 @@ public class SignUpActivity extends AppCompatActivity implements IData {
         username = findViewById(R.id.sa_et_username);
         password = findViewById(R.id.sa_et_password);
         confirmPassword = findViewById(R.id.sa_et_confirmPassword);
-
         mAuth = FirebaseAuth.getInstance();
         signupButton = findViewById(R.id.sa_btn_signUp);
 
@@ -73,7 +70,6 @@ public class SignUpActivity extends AppCompatActivity implements IData {
     }
     public void onStart() {
         super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser !=null){
             Intent intent = new Intent(SignUpActivity.this, TripProfileActivity.class);
@@ -92,8 +88,4 @@ public class SignUpActivity extends AppCompatActivity implements IData {
         return false;
     }
 
-    @Override
-    public void sendResponse(ServiceHelper response, String objectTypeModel) {
-
-    }
 }
