@@ -5,31 +5,22 @@
     android:id="@+id/lp_mainLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/blue_themed_gradient"
     tools:context=".activities.LoginActivity">
 
-    <ImageView
-        android:id="@+id/la_iv_appLogo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/app_icon" />
-
-    <EditText
-        android:id="@+id/la_et_username"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="20dp"
-        android:ems="10"
-        android:hint="@string/et_username_placeholder"
-        android:inputType="textEmailAddress"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/la_iv_appLogo" />
+    <Button
+        android:id="@+id/la_btn_login"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="50dp"
+        android:background="@drawable/blue_themed_gradient"
+        android:text="Login"
+        android:textAllCaps="false"
+        android:textColor="@color/primaryDarkColor"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@+id/la_et_password"
+        app:layout_constraintStart_toStartOf="@+id/la_et_password"
+        app:layout_constraintTop_toBottomOf="@+id/la_et_password" />
 
     <EditText
         android:id="@+id/la_et_password"
@@ -38,45 +29,51 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
+        android:background="@drawable/shape"
         android:ems="10"
         android:hint="@string/et_password_placeholder"
         android:inputType="textPassword"
+        android:paddingLeft="8dp"
+        android:paddingTop="12dp"
+        android:paddingRight="8dp"
+        android:paddingBottom="12dp"
+        android:textColorHint="#4985AA"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/la_et_username" />
 
-    <Button
-        android:id="@+id/la_btn_login"
-        android:layout_width="150dp"
+    <EditText
+        android:id="@+id/la_et_username"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="8dp"
-        android:background="#00FFFFFF"
-        android:text="Login"
-        android:textAllCaps="false"
-        android:textColor="@color/primaryDarkColor"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/signUp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/la_et_password"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <com.google.android.gms.common.SignInButton
-        android:id="@+id/sign_in_button"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="40dp"
         android:layout_marginEnd="20dp"
-        app:layout_constraintBottom_toTopOf="@+id/signUp"
+        android:background="@drawable/shape"
+        android:ems="10"
+        android:hint="@string/et_username_placeholder"
+        android:inputType="textEmailAddress"
+        android:paddingLeft="8dp"
+        android:paddingTop="12dp"
+        android:paddingRight="8dp"
+        android:paddingBottom="12dp"
+        android:textColorHint="#4985AA"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.97"
-        app:layout_constraintStart_toEndOf="@+id/la_btn_login"
-        app:layout_constraintTop_toBottomOf="@+id/la_et_password"
-        app:layout_constraintVertical_bias="0.0"
-        tools:ignore="MissingConstraints" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/la_iv_appLogo" />
+
+    <ImageView
+        android:id="@+id/la_iv_appLogo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/app_icon" />
 
     <TextView
-        android:id="@+id/signUp"
+        android:id="@+id/la_btn_signUp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Not a user ? Sign Up here!!"
@@ -84,7 +81,17 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/la_et_password"
-        app:layout_constraintVertical_bias="0.45" />
+        app:layout_constraintTop_toBottomOf="@+id/sign_in_button" />
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/sign_in_button"
+        android:layout_width="wrap_content"
+        android:layout_height="55dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/blue_themed_gradient"
+        app:layout_constraintEnd_toEndOf="@+id/la_btn_login"
+        app:layout_constraintStart_toStartOf="@+id/la_btn_login"
+        app:layout_constraintTop_toBottomOf="@+id/la_btn_login"
+        tools:ignore="MissingConstraints" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

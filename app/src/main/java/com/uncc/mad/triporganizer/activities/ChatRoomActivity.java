@@ -2,10 +2,13 @@ package com.uncc.mad.triporganizer.activities;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.firebase.ui.database.FirebaseListOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -16,6 +19,7 @@ import com.uncc.mad.triporganizer.R;
 import com.uncc.mad.triporganizer.models.ChatRoom;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
@@ -35,6 +39,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
+        setCustomActionBar();
         Intent intent = getIntent();
         if(intent!=null && intent.getExtras()!=null){
            tripDB = intent.getStringExtra("TRIPID");
@@ -94,6 +99,34 @@ public class ChatRoomActivity extends AppCompatActivity {
             };
 
         listOfMessages.setAdapter(adapter);
+    }
+
+    private void setCustomActionBar(){
+        ActionBar action = getSupportActionBar();
+        action.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        action.setDisplayShowCustomEnabled(true);
+        action.setCustomView(R.layout.custom_action_bar);
+        ImageView imageButton= (ImageView)action.getCustomView().findViewById(R.id.btn_logout);
+        TextView pageTitle = action.getCustomView().findViewById(R.id.action_bar_title);
+        pageTitle.setText("MESSAGES");
+        imageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut();
+                LoginActivity.mGoogleSignInClient.signOut();
+                SharedPreferences.Editor editor = UserProfileActivity.sp.edit();
+                editor.clear().commit();
+                GoogleSignInAccount account = null;
+                Intent intent = new Intent(ChatRoomActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+        Toolbar toolbar=(Toolbar)action.getCustomView().getParent();
+        toolbar.setContentInsetsAbsolute(0, 0);
+        toolbar.getContentInsetEnd();
+        toolbar.setPadding(0, 0, 0, 0);
+        getWindow().setStatusBarColor(getColor(R.color.primaryDarkColor));
     }
 
 }

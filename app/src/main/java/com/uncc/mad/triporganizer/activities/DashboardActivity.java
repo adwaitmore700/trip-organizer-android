@@ -1,7 +1,9 @@
 package com.uncc.mad.triporganizer.activities;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -32,13 +34,16 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.Inflater;
 
 public class DashboardActivity extends AppCompatActivity {
     TextView fullName;
@@ -57,6 +62,9 @@ public class DashboardActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
+
+        setCustomActionBar();
+
         initialize();
 
         findViewById(R.id.db_iv_edit_profile).setOnClickListener(new View.OnClickListener() {
@@ -67,9 +75,28 @@ public class DashboardActivity extends AppCompatActivity {
 
             }
         });
-        findViewById(R.id.db_signOut).setOnClickListener(new View.OnClickListener() {
+
+        findViewById(R.id.db_add_trip_container).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent intent = new Intent(DashboardActivity.this, TripProfileActivity.class);
+                startActivity(intent);
+            }
+        });
+
+    }
+
+    private void setCustomActionBar(){
+        ActionBar action = getSupportActionBar();
+        action.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        action.setDisplayShowCustomEnabled(true);
+        action.setCustomView(R.layout.custom_action_bar);
+        ImageView imageButton= (ImageView)action.getCustomView().findViewById(R.id.btn_logout);
+        TextView pageTitle = action.getCustomView().findViewById(R.id.action_bar_title);
+        pageTitle.setText("DASHBOARD");
+        imageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 FirebaseAuth.getInstance().signOut();
                 LoginActivity.mGoogleSignInClient.signOut();
                 SharedPreferences.Editor editor = UserProfileActivity.sp.edit();
@@ -80,15 +107,11 @@ public class DashboardActivity extends AppCompatActivity {
                 finish();
             }
         });
-
-        findViewById(R.id.db_btn_add_trip).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(DashboardActivity.this, TripProfileActivity.class);
-                startActivity(intent);
-            }
-        });
-
+        Toolbar toolbar=(Toolbar)action.getCustomView().getParent();
+        toolbar.setContentInsetsAbsolute(0, 0);
+        toolbar.getContentInsetEnd();
+        toolbar.setPadding(0, 0, 0, 0);
+        getWindow().setStatusBarColor(getColor(R.color.primaryDarkColor));
     }
 
     @SuppressLint("WrongViewCast")

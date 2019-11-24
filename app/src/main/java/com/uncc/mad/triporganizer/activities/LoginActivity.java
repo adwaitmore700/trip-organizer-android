@@ -50,7 +50,7 @@ public class LoginActivity extends AppCompatActivity {
         loginButton = findViewById(R.id.la_btn_login);
         username = findViewById(R.id.la_et_username);
         password = findViewById(R.id.la_et_password);
-        signup = findViewById(R.id.signUp);
+        signup = findViewById(R.id.la_btn_signUp);
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))

@@ -2,7 +2,9 @@ package com.uncc.mad.triporganizer.activities;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -62,18 +64,8 @@ public class TripProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trip_profile);
+        setCustomActionBar();
         initialize();
-        findViewById(R.id.btnSignOut).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FirebaseAuth.getInstance().signOut();
-                LoginActivity.mGoogleSignInClient.signOut();
-                GoogleSignInAccount account = null;
-                Intent intent = new Intent(TripProfileActivity.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });
 
         findViewById(R.id.tripImage).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -160,5 +152,31 @@ public class TripProfileActivity extends AppCompatActivity {
         });
     }
 
-
+    private void setCustomActionBar(){
+        ActionBar action = getSupportActionBar();
+        action.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        action.setDisplayShowCustomEnabled(true);
+        action.setCustomView(R.layout.custom_action_bar);
+        ImageView imageButton= (ImageView)action.getCustomView().findViewById(R.id.btn_logout);
+        TextView pageTitle = action.getCustomView().findViewById(R.id.action_bar_title);
+        pageTitle.setText("TRIP DETAILS");
+        imageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut();
+                LoginActivity.mGoogleSignInClient.signOut();
+                SharedPreferences.Editor editor = UserProfileActivity.sp.edit();
+                editor.clear().commit();
+                GoogleSignInAccount account = null;
+                Intent intent = new Intent(TripProfileActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+        Toolbar toolbar=(Toolbar)action.getCustomView().getParent();
+        toolbar.setContentInsetsAbsolute(0, 0);
+        toolbar.getContentInsetEnd();
+        toolbar.setPadding(0, 0, 0, 0);
+        getWindow().setStatusBarColor(getColor(R.color.primaryDarkColor));
+    }
 }
