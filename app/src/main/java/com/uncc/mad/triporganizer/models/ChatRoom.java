@@ -7,16 +7,27 @@ public class ChatRoom {
     private String TripId;
     private String UserId;
     private String uId;
+    private String MessageType;
+    private String ImageUrl;
+    private String Messages;
+    private long time;
 
-//    public String getChatPhoto() {
-//        return chatPhoto;
-//    }
-//
-//    public void setChatPhoto(String chatPhoto) {
-//        this.chatPhoto = chatPhoto;
-//    }
-//
-//    private String chatPhoto;
+    public String getMessageType() {
+        return MessageType;
+    }
+
+    public void setMessageType(String messageType) {
+        MessageType = messageType;
+    }
+
+    public String getImageUrl() {
+        return ImageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        ImageUrl = imageUrl;
+    }
+
     public String getuId() {
         return uId;
     }
@@ -24,9 +35,6 @@ public class ChatRoom {
     public void setuId(String uId) {
         this.uId = uId;
     }
-
-    private String Messages;
-    private long time;
 
     public long getTime() {
         return time;
