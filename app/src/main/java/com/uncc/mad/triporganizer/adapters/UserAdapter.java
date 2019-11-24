@@ -10,15 +10,19 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.squareup.picasso.Picasso;
 import com.uncc.mad.triporganizer.R;
+import com.uncc.mad.triporganizer.activities.AddUsers;
+import com.uncc.mad.triporganizer.activities.TripProfileActivity;
 import com.uncc.mad.triporganizer.models.UserProfile;
 
 import java.util.ArrayList;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
 public  static ArrayList<UserProfile> userList;
-
+Boolean addflag = true;
 public UserAdapter(ArrayList<UserProfile> userList) {
         this.userList = userList;
         }
@@ -33,11 +37,29 @@ public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType
         }
 
 @Override
-public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
-        UserProfile u1 = userList.get(position);
+public void onBindViewHolder(@NonNull final UserViewHolder holder, int position) {
+        final UserProfile u1 = userList.get(position);
         holder.userListFullName.setText(u1.getFirstName()+" " + u1.getLastName());
         Picasso.get().load(u1.getImageUrl()).into(holder.userphoto);
 
+
+        holder.addUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DocumentReference tripRef = TripProfileActivity.db.collection("Trips").document(AddUsers.tripID);
+             if(addflag){
+                tripRef.update("authorizedUsers", FieldValue.arrayUnion(u1.getUserUID()));
+                holder.addUser.setText("Remove");
+                addflag =false;
+             }
+             else{
+                addflag = true;
+                 tripRef.update("authorizedUsers", FieldValue.arrayRemove(u1.getUserUID()));
+                 holder.addUser.setText("Add");
+             }
+
+            }
+        });
         }
 
 @Override

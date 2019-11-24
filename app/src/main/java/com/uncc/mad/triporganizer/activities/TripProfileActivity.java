@@ -48,27 +48,15 @@ import java.util.ArrayList;
 public class TripProfileActivity extends AppCompatActivity {
     TextView title,lati,longi;
     ImageView tripImage;
-    ProgressDialog pb;
     private FirebaseAuth mAuth;
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
+   public static FirebaseFirestore db = FirebaseFirestore.getInstance();
     String ADDUSER = "AddUser";
-    TextView tvfirstName,tvlastName;
-    RadioGroup rg;
-    RadioButton male,female;
-    String gender = null;
-    String userID = null;
     ImageView iv_TakePhoto;
     static SharedPreferences sp=null;
     DocumentReference docRef = null;
     static final int REQUEST_IMAGE_CAPTURE = 1;
     Bitmap bitmapUpload = null;
-    ProgressBar progressBar;
-    RecyclerView recyclerView;
     String path = null;
-    public static RecyclerView.Adapter mAdapter;
-    public RecyclerView.LayoutManager layoutManager;
-    ArrayList<UserProfile> userList = new ArrayList<>();
-    int flag = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,8 +120,7 @@ public class TripProfileActivity extends AppCompatActivity {
         lati = findViewById(R.id.tripLat);
         longi = findViewById(R.id.tripLng);
         tripImage = findViewById(R.id.tripImage);
-
-        setUserAdapter();
+       // setUserAdapter();
         }
 
     private void uploadImage(Bitmap photoBitmap){
@@ -165,51 +152,13 @@ public class TripProfileActivity extends AppCompatActivity {
                     trip.setLocationLatitude(Double.parseDouble(lati.getText().toString()));
                     trip.setLocationLongitude(Double.parseDouble(longi.getText().toString()));
                     db.collection("Trips").document(tripTitle).set(trip);
-                 //   sp.getString("LoggedInUser","");
-                   // Gson gson = new Gson();
-                    //String json = gson.toJson(user);
-                    //sp = getPreferences(Context.MODE_PRIVATE);
-                    //SharedPreferences.Editor editor = sp.edit();
-                    //editor.clear();
-                    //editor.putString("LoggedInUser", json);
-                    //editor.commit();
-                    Intent intent = new Intent(TripProfileActivity.this, DashboardActivity.class);
+                    Intent intent = new Intent(TripProfileActivity.this, AddUsers.class);
+                    intent.putExtra("TRIPID",tripTitle);
                     startActivity(intent);
-                    //finish();
                 }
             }
         });
     }
 
-    public void setUserAdapter(){
-        recyclerView = findViewById(R.id.usersRecyclerView);
-        recyclerView.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(TripProfileActivity.this);
-
-        pb = ProgressDialog.show(TripProfileActivity.this,"","Getting Users...",true);
-        db.collection("Users")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                UserProfile userProfile = document.toObject(UserProfile.class);
-                                userList.add(userProfile);
-                            }
-                            if(flag == 0) {
-                                recyclerView.setLayoutManager(layoutManager);
-                               mAdapter = new UserAdapter(userList);
-                                recyclerView.setAdapter(mAdapter);
-                            }
-                            mAdapter.notifyDataSetChanged();
-                            flag = 1;
-                            pb.dismiss();
-                        } else {
-                            Log.d("demo", "Error getting User list: ", task.getException());
-                        }
-                    }
-                });
-    }
 
 }

@@ -1,24 +1,47 @@
 package com.uncc.mad.triporganizer.adapters;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 import com.uncc.mad.triporganizer.R;
+import com.uncc.mad.triporganizer.activities.ChatRoomActivity;
+import com.uncc.mad.triporganizer.activities.DashboardActivity;
+import com.uncc.mad.triporganizer.activities.MainActivity;
+import com.uncc.mad.triporganizer.activities.TripProfileActivity;
 import com.uncc.mad.triporganizer.models.Trip;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripVIewHolder> {
     public  static ArrayList<Trip> tripList;
+    Boolean joinFlag = true,chat=false;
+
+    ArrayList<String> listOfAuthUsers = new ArrayList<>();
 
     public TripAdapter(ArrayList<Trip> tripList) {
         this.tripList = tripList;
@@ -34,12 +57,89 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripVIewHolder
     }
 
     @Override
-    public void onBindViewHolder(@NonNull TripVIewHolder holder, int position) {
-        Trip t1 = tripList.get(position);
+    public void onBindViewHolder(@NonNull final TripVIewHolder holder, final int position) {
+        final Trip t1 = tripList.get(position);
         holder.title.setText(t1.getTitle());
         holder.location.setText(t1.getLocationLatitude()+","+t1.getLocationLongitude());
         Picasso.get().load(t1.getTripImageUrl()).into(holder.tripImage);
 
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(final View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                builder.setMessage("Are you sure you want to delete ?").setTitle("Delete Trip")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                deleteTrip(t1.getId(),position);
+                                Toast.makeText(view.getContext(), "Trip Deleted", Toast.LENGTH_SHORT).show();
+                            }
+                        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                });
+               AlertDialog alert = builder.create();
+                alert.show();
+                return false;
+            }
+        });
+
+        holder.joinLeaveBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DocumentReference tripRef = TripProfileActivity.db.collection("Trips").document(t1.getId());
+                if(joinFlag){
+                    tripRef.update("authorizedUsers", FieldValue.arrayUnion(FirebaseAuth.getInstance().getCurrentUser().getUid()));
+                    holder.joinLeaveBtn.setText("Leave");
+                    joinFlag =false;
+                    chat = true;
+                }
+                else{
+                    tripRef.update("authorizedUsers", FieldValue.arrayRemove(FirebaseAuth.getInstance().getCurrentUser().getUid()));
+                    joinFlag = true;
+                    chat = false;
+                    holder.joinLeaveBtn.setText("Join");
+                }
+            }
+        });
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+               TripProfileActivity.db.collection("Trips").document(t1.getId())
+                       .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                   @Override
+                   public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                       if (task.isSuccessful()) {
+                           DocumentSnapshot document = task.getResult();
+                           Log.d("demo",t1.getId()+"");
+                           if (document.exists()) {
+                               listOfAuthUsers = (ArrayList<String>) document.getData().get("authorizedUsers");
+                               for (String id:listOfAuthUsers)
+                                   if(id.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
+                                       chat = true;
+                                   }
+                           } else {
+                               Log.d("demo", "No such document");
+                           }
+                       } else {
+                           Log.d("demo", "get failed with ", task.getException());
+                       }
+
+                   }
+               });
+                if(chat){
+                Intent i = new Intent(view.getContext(), ChatRoomActivity.class);
+                i.putExtra("TRIPID", t1.getId());
+                view.getContext().startActivity(i);
+            }
+            else{
+                    Toast.makeText(view.getContext(), "You are not added in Trip yet", Toast.LENGTH_SHORT).show();}
+                    listOfAuthUsers = null;
+            }
+        });
     }
 
     @Override
@@ -50,12 +150,20 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripVIewHolder
     public static class TripVIewHolder extends RecyclerView.ViewHolder{
         public TextView title,location;
         public ImageView tripImage;
-
-        public TripVIewHolder(@NonNull View itemView) {
+        public Button joinLeaveBtn;
+    //    AlertDialog alert;
+        public TripVIewHolder(@NonNull final View itemView) {
             super(itemView);
+            joinLeaveBtn = itemView.findViewById(R.id.buttonJoinLeave);
             title = itemView.findViewById(R.id.trip_item_title);
             location = itemView.findViewById(R.id.trip_item_location);
             tripImage = itemView.findViewById(R.id.trip_item_photo);
+
         }
+    }
+    public void deleteTrip(String document,int position){
+        tripList.remove(position);
+        TripProfileActivity.db.collection("Trips").document(document).delete();
+        DashboardActivity.mAdapter.notifyDataSetChanged();
     }
 }

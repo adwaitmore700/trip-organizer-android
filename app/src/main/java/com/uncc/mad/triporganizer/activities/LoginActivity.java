@@ -3,6 +3,7 @@ package com.uncc.mad.triporganizer.activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,6 +26,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.uncc.mad.triporganizer.R;
 import com.uncc.mad.triporganizer.models.UserProfile;
 
@@ -36,6 +39,7 @@ public class LoginActivity extends AppCompatActivity {
     private TextView username;
     private TextView password;
     private TextView signup;
+    private ProgressDialog loader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,8 +88,8 @@ public class LoginActivity extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {
-                                        Intent intent = new Intent(LoginActivity.this, UserProfileActivity.class);
-                                        startActivity(intent);
+                                        loader = ProgressDialog.show(LoginActivity.this, "", "Initializing ...", true);
+                                        startIntent();
                                     } else {
                                         Log.d("demo", "signInWithEmail:failure", task.getException());
                                         Toast.makeText(LoginActivity.this, "Invalid Credentials", Toast.LENGTH_SHORT).show();
@@ -102,14 +106,15 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        loader = ProgressDialog.show(LoginActivity.this, "", "Initializing ...", true);
         FirebaseUser currentUser = mAuth.getCurrentUser();
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         if(currentUser !=null || account!=null){
-            Intent intent = new Intent(LoginActivity.this, UserProfileActivity.class);
-            startActivity(intent); 
+           startIntent();
         }
-        else
-            Toast.makeText(LoginActivity.this, "Login to proceed", Toast.LENGTH_SHORT).show();
+        else{
+            loader.dismiss();
+            Toast.makeText(LoginActivity.this, "Login to proceed", Toast.LENGTH_SHORT).show();}
     }
 
     @Override
@@ -140,16 +145,14 @@ public class LoginActivity extends AppCompatActivity {
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-           // Toast.makeText(LoginActivity.this, account.getId()+"", Toast.LENGTH_SHORT).show();
-          //  Log.d("Demo", account.getId() + "      " + account.getIdToken());
             AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
             mAuth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()) {
                         Log.d("demo", "signInWithCredential:success");
-                        Intent intent = new Intent(LoginActivity.this, UserProfileActivity.class);
-                        startActivity(intent);
+                        loader = ProgressDialog.show(LoginActivity.this, "", "Initializing ...", true);
+                        startIntent();
                     } else {
                         Log.w("demo", "signInWithCredential:failure", task.getException());
                     }
@@ -159,5 +162,31 @@ public class LoginActivity extends AppCompatActivity {
             Log.w("demo", "signInResult:failed code=" + e.toString());
            Toast.makeText(LoginActivity.this, "Login Failed", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void startIntent(){
+        TripProfileActivity.db.collection("Users").document(mAuth.getCurrentUser().getUid())
+        .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
+                        startActivity(intent);
+                        loader.dismiss();
+                        finish();
+                    } else {
+                        Intent intent = new Intent(LoginActivity.this, UserProfileActivity.class);
+                        startActivity(intent);
+                        loader.dismiss();
+                        finish();
+                    }
+                } else {
+                    loader.dismiss();
+                    Log.d("demo", "get failed with ", task.getException());
+                }
+            }
+        });
     }
 }

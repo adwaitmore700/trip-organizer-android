@@ -25,6 +25,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -40,13 +42,13 @@ import java.io.ByteArrayOutputStream;
 
 public class UserProfileActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    static FirebaseFirestore db = FirebaseFirestore.getInstance();
     String ADDUSER = "AddUser";
     TextView tvfirstName,tvlastName;
     RadioGroup rg;
     RadioButton male,female;
     String gender = null;
-    String userID = null;
+    public static String userID = null;
     ImageView iv_TakePhoto;
     static SharedPreferences sp=null;
     DocumentReference docRef = null;
@@ -61,7 +63,6 @@ public class UserProfileActivity extends AppCompatActivity {
 
         initialize();
         userID = mAuth.getCurrentUser().getUid();
-
          docRef = db.collection("Users").document(userID);
         if(docRef!=null){
             setProfile();
@@ -179,6 +180,12 @@ public class UserProfileActivity extends AppCompatActivity {
                     user.setUserGender(gender);
                     user.setImageUrl(imageURL);
                     user.setUserUID(UID);
+                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                            .setDisplayName(tvfirstName.getText().toString() + " " + tvlastName.getText().toString())
+                            .setPhotoUri(task.getResult())
+                            .build();
+
+                    mAuth.getCurrentUser().updateProfile(profileUpdates);
                     db.collection("Users").document( UID).set(user);
                     Gson gson = new Gson();
                     String json = gson.toJson(user);

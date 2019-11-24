@@ -7,8 +7,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -57,12 +59,12 @@ public class DashboardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_dashboard);
         initialize();
 
-
         findViewById(R.id.db_iv_edit_profile).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(DashboardActivity.this, ChatRoomActivity.class);
+                Intent intent = new Intent(DashboardActivity.this, UserProfileActivity.class);
                 startActivity(intent);
+
             }
         });
         findViewById(R.id.db_signOut).setOnClickListener(new View.OnClickListener() {
@@ -94,11 +96,25 @@ public class DashboardActivity extends AppCompatActivity {
         gender = findViewById(R.id.db_tv_gender_text);
         fullName = findViewById(R.id.db_tv_fullName_text);
         myImage = findViewById(R.id.db_iv_profile_photo);
-        Gson gson = new Gson();
-        UserProfile loggedinUser = gson.fromJson(UserProfileActivity.sp.getString("LoggedInUser", ""),UserProfile.class);
-        gender.setText(loggedinUser.getUserGender());
-        fullName.setText(loggedinUser.getFirstName()+ " " + loggedinUser.getLastName());
-        Picasso.get().load(loggedinUser.getImageUrl()).into(myImage);
+        final Gson gson = new Gson();
+        final UserProfile[] loggedinUser = {null};
+        FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                       loggedinUser[0] = documentSnapshot.toObject(UserProfile.class);
+                        gender.setText(loggedinUser[0].getUserGender());
+                        fullName.setText(loggedinUser[0].getFirstName()+ " " + loggedinUser[0].getLastName());
+                        Picasso.get().load(loggedinUser[0].getImageUrl()).into(myImage);
+                        String json = gson.toJson(loggedinUser[0]);
+                        UserProfileActivity.sp = getPreferences(Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = UserProfileActivity.sp.edit();
+                        editor.clear();
+                        editor.putString("LoggedInUser", json);
+                        editor.commit();
+                    }
+                });
+
         recyclerView = findViewById(R.id.db_lv_trips);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(DashboardActivity.this);
