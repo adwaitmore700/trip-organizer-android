@@ -2,9 +2,29 @@ package com.uncc.mad.triporganizer.models;
 
 import android.graphics.Bitmap;
 
+import java.util.ArrayList;
+
 public class Trip {
     private String Id;
     private String Title;
+    public String adminId;
+
+    public ArrayList<String> getAuthUsersId() {
+        return authUsersId;
+    }
+
+    public void setAuthUsersId(ArrayList<String> authUsersId) {
+        this.authUsersId = authUsersId;
+    }
+
+    public ArrayList<String> authUsersId;
+    public String getAdminId() {
+        return adminId;
+    }
+
+    public void setAdminId(String adminId) {
+        this.adminId = adminId;
+    }
 
     public String getTripImageUrl() {
         return tripImageUrl;

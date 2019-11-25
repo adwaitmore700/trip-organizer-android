@@ -32,7 +32,7 @@ import com.uncc.mad.triporganizer.R;
 import com.uncc.mad.triporganizer.models.UserProfile;
 
 public class LoginActivity extends AppCompatActivity {
-    private FirebaseAuth mAuth;
+    public static FirebaseAuth mAuth;
     public static GoogleSignInClient mGoogleSignInClient;
     private static final int RC_SIGN_IN = 9001;
     private Button loginButton;
@@ -40,6 +40,8 @@ public class LoginActivity extends AppCompatActivity {
     private TextView password;
     private TextView signup;
     private ProgressDialog loader;
+    FirebaseUser currentUser =null;
+    public GoogleSignInAccount account = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +91,10 @@ public class LoginActivity extends AppCompatActivity {
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {
                                         loader = ProgressDialog.show(LoginActivity.this, "", "Initializing ...", true);
-                                        startIntent();
+                                         Intent intent = new Intent(LoginActivity.this, UserProfileActivity.class);
+                        startActivity(intent);
+                        loader.dismiss();
+                        finish();
                                     } else {
                                         Log.d("demo", "signInWithEmail:failure", task.getException());
                                         Toast.makeText(LoginActivity.this, "Invalid Credentials", Toast.LENGTH_SHORT).show();
@@ -103,19 +108,19 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        loader = ProgressDialog.show(LoginActivity.this, "", "Initializing ...", true);
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        if(currentUser !=null || account!=null){
-           startIntent();
-        }
-        else{
-            loader.dismiss();
-            Toast.makeText(LoginActivity.this, "Login to proceed", Toast.LENGTH_SHORT).show();}
-    }
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//        loader = ProgressDialog.show(LoginActivity.this, "", "Initializing ...", true);
+//         currentUser = mAuth.getCurrentUser();
+//         account = GoogleSignIn.getLastSignedInAccount(this);
+//        if(currentUser !=null || account!=null){
+//           startIntent();
+//        }
+//        else{
+//            loader.dismiss();
+//            Toast.makeText(LoginActivity.this, "Login to proceed", Toast.LENGTH_SHORT).show();}
+//    }
 
     @Override
     protected void onResume() {
@@ -152,7 +157,10 @@ public class LoginActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         Log.d("demo", "signInWithCredential:success");
                         loader = ProgressDialog.show(LoginActivity.this, "", "Initializing ...", true);
-                        startIntent();
+                        Intent intent = new Intent(LoginActivity.this, UserProfileActivity.class);
+                        startActivity(intent);
+                        loader.dismiss();
+                        finish();
                     } else {
                         Log.w("demo", "signInWithCredential:failure", task.getException());
                     }
@@ -164,29 +172,31 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    public void startIntent(){
-        TripProfileActivity.db.collection("Users").document(mAuth.getCurrentUser().getUid())
-        .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
-                        startActivity(intent);
-                        loader.dismiss();
-                        finish();
-                    } else {
-                        Intent intent = new Intent(LoginActivity.this, UserProfileActivity.class);
-                        startActivity(intent);
-                        loader.dismiss();
-                        finish();
-                    }
-                } else {
-                    loader.dismiss();
-                    Log.d("demo", "get failed with ", task.getException());
-                }
-            }
-        });
-    }
+//    public void startIntent(){
+////        String user = null;
+//        currentUser = mAuth.getCurrentUser();
+//        account = GoogleSignIn.getLastSignedInAccount(this);
+//        user = mAuth.getCurrentUser().getUid();
+//        TripProfileActivity.db.collection("Users").document(user)
+//        .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//            @Override
+//            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                if (task.isSuccessful()) {
+//                    DocumentSnapshot document = task.getResult();
+//                    if (document.exists()) {
+//                        Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
+//                        startActivity(intent);
+//                        loader.dismiss();
+//                        finish();
+//                    } else {
+//
+//                        finish();
+//                    }
+//                } else {
+//                    loader.dismiss();
+//                    Log.d("demo", "get failed with ", task.getException());
+//                }
+//            }
+//        });
+//    }
 }

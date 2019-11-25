@@ -16,9 +16,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.ListResult;
-import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 import com.uncc.mad.triporganizer.R;
@@ -31,19 +28,13 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.zip.Inflater;
 
 public class DashboardActivity extends AppCompatActivity {
     TextView fullName;
@@ -57,6 +48,7 @@ public class DashboardActivity extends AppCompatActivity {
     public RecyclerView.LayoutManager layoutManager;
     ArrayList<Trip> tripList = new ArrayList<>();
     int flag = 0;
+    Boolean joinTrip = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +64,6 @@ public class DashboardActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(DashboardActivity.this, UserProfileActivity.class);
                 startActivity(intent);
-
             }
         });
 
@@ -81,6 +72,17 @@ public class DashboardActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(DashboardActivity.this, TripProfileActivity.class);
                 startActivity(intent);
+            }
+        });
+
+        findViewById(R.id.db_join_trip_container).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                joinTrip =( joinTrip == true) ?  false : true;
+                mAdapter = new TripAdapter(tripList,joinTrip);
+                recyclerView.setAdapter(mAdapter);
+                mAdapter.notifyDataSetChanged();
+
             }
         });
 
@@ -138,7 +140,7 @@ public class DashboardActivity extends AppCompatActivity {
                     }
                 });
 
-        recyclerView = findViewById(R.id.db_lv_trips);
+        recyclerView = findViewById(R.id.usersRecyclerView);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(DashboardActivity.this);
 
@@ -155,7 +157,7 @@ public class DashboardActivity extends AppCompatActivity {
                             }
                             if(flag == 0) {
                                 recyclerView.setLayoutManager(layoutManager);
-                                  mAdapter = new TripAdapter(tripList);
+                                  mAdapter = new TripAdapter(tripList,joinTrip);
                                 recyclerView.setAdapter(mAdapter);
                             }
                             mAdapter.notifyDataSetChanged();

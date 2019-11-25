@@ -9,9 +9,12 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.uncc.mad.triporganizer.R;
@@ -26,6 +29,8 @@ public class AddUsers extends AppCompatActivity {
     public static RecyclerView.Adapter mAdapter;
     ProgressDialog pb;
     ArrayList<UserProfile> userList = new ArrayList<>();
+   // ArrayList<UserProfile> addedUsers = new ArrayList<>();
+
     int flag = 0;
     public static String tripID = null;
 
@@ -33,14 +38,40 @@ public class AddUsers extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_users);
-
         Intent i = getIntent();
          tripID = i.getStringExtra("TRIPID");
         initialize();
+
+
+        findViewById(R.id.btnSaveTrip).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("demo",UserAdapter.addedUsers.toString());
+               // DocumentReference tripRef = TripProfileActivity.db.collection("Trips").document(tripID);
+//                tripRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                        if (task.isSuccessful()) {
+//                            DocumentSnapshot document = task.getResult();
+//                          ArrayList<String> usersID = (ArrayList<String>) document.getData().get("authorizedUsers");
+//                            for(int i=0;i<userList.size();i++){
+//                                for(int j=0;j<usersID.size();j++){
+//                                    if(userList.get(i).getUserUID().equals(usersID.get(j))){
+//                                        addedUsers.add(userList.get(i));
+//
+//                                    }
+//                                }
+//                            }
+                            Intent returnIntent = new Intent();
+                            returnIntent.putExtra("ADDEDUSERS",UserAdapter.addedUsers);
+                            setResult(RESULT_OK,returnIntent);
+                            finish();
+
+            }
+        });
     }
 
     public void initialize(){
-
         recyclerView = findViewById(R.id.usersRecyclerView);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(AddUsers.this);

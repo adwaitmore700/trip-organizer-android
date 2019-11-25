@@ -8,12 +8,15 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -21,9 +24,12 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
+import com.squareup.picasso.Picasso;
 import com.uncc.mad.triporganizer.R;
+import com.uncc.mad.triporganizer.adapters.AddedUserAdapter;
 import com.uncc.mad.triporganizer.adapters.TripAdapter;
 import com.uncc.mad.triporganizer.adapters.UserAdapter;
+import com.uncc.mad.triporganizer.models.ChatRoom;
 import com.uncc.mad.triporganizer.models.Trip;
 import com.uncc.mad.triporganizer.models.UserProfile;
 
@@ -38,33 +44,43 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 public class TripProfileActivity extends AppCompatActivity {
     TextView title,lati,longi;
+    RecyclerView recyclerView;
+    public RecyclerView.LayoutManager layoutManager;
+    public  RecyclerView.Adapter Adapter;
     ImageView tripImage;
-    private FirebaseAuth mAuth;
    public static FirebaseFirestore db = FirebaseFirestore.getInstance();
     String ADDUSER = "AddUser";
-    ImageView iv_TakePhoto;
+  // ImageView iv_TakePhoto;
+    Button invite,chatRoom,joinBtn;
     static SharedPreferences sp=null;
     DocumentReference docRef = null;
     static final int REQUEST_IMAGE_CAPTURE = 1;
+    ArrayList<String> addedUserID = new ArrayList<>();
     Bitmap bitmapUpload = null;
     String path = null;
+    static String tripID = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trip_profile);
         setCustomActionBar();
+
         initialize();
 
         findViewById(R.id.tripImage).setOnClickListener(new View.OnClickListener() {
@@ -78,6 +94,32 @@ public class TripProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 uploadImage(getBitmapCamera());
+            }
+        });
+
+        findViewById(R.id.join).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+              //  startActivityForResult(intent,22);
+            }
+        });
+
+        findViewById(R.id.inviteUsers).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(TripProfileActivity.this,AddUsers.class);
+                intent.putExtra("TRIPID",tripID);
+                startActivityForResult(intent,22);
+            }
+        });
+
+        findViewById(R.id.navigateChatRoom).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(TripProfileActivity.this,ChatRoomActivity.class);
+                intent.putExtra("TRIPID",tripID);
+                startActivity(intent);
             }
         });
     }
@@ -102,7 +144,7 @@ public class TripProfileActivity extends AppCompatActivity {
 
     private Bitmap getBitmapCamera() {
         if (bitmapUpload == null){
-            return ((BitmapDrawable) iv_TakePhoto.getDrawable()).getBitmap();
+            return ((BitmapDrawable) tripImage.getDrawable()).getBitmap();
         }
         return bitmapUpload;
     }
@@ -111,8 +153,22 @@ public class TripProfileActivity extends AppCompatActivity {
         title = findViewById(R.id.tripTitle);
         lati = findViewById(R.id.tripLat);
         longi = findViewById(R.id.tripLng);
+       //iv_TakePhoto = findViewById(R.id.tripImage);
         tripImage = findViewById(R.id.tripImage);
-       // setUserAdapter();
+        invite = findViewById(R.id.inviteUsers);
+        chatRoom = findViewById(R.id.navigateChatRoom);
+        recyclerView = findViewById(R.id.usersRecyclerView);
+        recyclerView.setHasFixedSize(true);
+        layoutManager = new LinearLayoutManager(TripProfileActivity.this);
+        joinBtn = findViewById(R.id.join);
+        Intent i1 = getIntent();
+        tripID = i1.getStringExtra("TRIPID");
+        if(tripID==null){
+
+        }
+        else{
+            setTrip(tripID);
+        }
         }
 
     private void uploadImage(Bitmap photoBitmap){
@@ -141,12 +197,15 @@ public class TripProfileActivity extends AppCompatActivity {
                     trip.setId(tripTitle);
                     trip.setTitle(tripTitle);
                     trip.setTripImageUrl(imageURL);
+                    trip.setAuthUsersId(addedUserID);
+                    trip.setAdminId(MainActivity.mAuth.getCurrentUser().getUid());
                     trip.setLocationLatitude(Double.parseDouble(lati.getText().toString()));
                     trip.setLocationLongitude(Double.parseDouble(longi.getText().toString()));
                     db.collection("Trips").document(tripTitle).set(trip);
-                    Intent intent = new Intent(TripProfileActivity.this, AddUsers.class);
-                    intent.putExtra("TRIPID",tripTitle);
+                    Intent intent = new Intent(TripProfileActivity.this, DashboardActivity.class);
+                   // intent.putExtra("TRIPID",tripTitle);
                     startActivity(intent);
+                    finish();
                 }
             }
         });
@@ -164,7 +223,7 @@ public class TripProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 FirebaseAuth.getInstance().signOut();
-                LoginActivity.mGoogleSignInClient.signOut();
+                MainActivity.mGoogleSignInClient.signOut();
                 SharedPreferences.Editor editor = UserProfileActivity.sp.edit();
                 editor.clear().commit();
                 GoogleSignInAccount account = null;
@@ -178,5 +237,60 @@ public class TripProfileActivity extends AppCompatActivity {
         toolbar.getContentInsetEnd();
         toolbar.setPadding(0, 0, 0, 0);
         getWindow().setStatusBarColor(getColor(R.color.primaryDarkColor));
+    }
+    public void setTrip(final String trip){
+        TripProfileActivity.db.collection("Trips").document(trip)
+                .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                Trip trip = documentSnapshot.toObject(Trip.class);
+                title.setText(trip.getTitle());
+                lati.setText(String.valueOf(trip.getLocationLatitude()));
+                longi.setText(String.valueOf(trip.getLocationLongitude()));
+                Picasso.get().load(trip.getTripImageUrl()).into(tripImage);
+                if(FirebaseAuth.getInstance().getCurrentUser().getUid().equals(trip.adminId)){
+                    joinBtn.setVisibility(View.INVISIBLE);
+                }
+                else
+                {
+                    invite.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+//        TripProfileActivity.db.collection("Trips").document(trip)
+//                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//            @Override
+//            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                if (task.isSuccessful()) {
+//                    DocumentSnapshot document = task.getResult();
+//                    Log.d("demo",trip+"");
+//                    if (document.exists()) {
+//                        document.getData().get()
+//                        listOfAuthUsers = (ArrayList<String>) document.getData().get("authorizedUsers");
+//                        for (String id:listOfAuthUsers) {
+//                            if (id.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+//                                chat = true;
+//                                break;
+//                            }
+//                        }
+//                        if(chat){
+//                            Intent i = new Intent(view.getContext(), ChatRoomActivity.class);
+//                            i.putExtra("TRIPID", t1.getId());
+//                            chat =false;
+//                            view.getContext().startActivity(i);
+//
+//                        }
+//                        else{
+//                            Toast.makeText(view.getContext(), "You are not added in trip yet!", Toast.LENGTH_SHORT).show();
+//                        }
+//                    } else {
+//                        Log.d("demo", "No such document");
+//                    }
+//                } else {
+//                    Log.d("demo", "get failed with ", task.getException());
+//                }
+//
+//            }
+//        });
     }
 }

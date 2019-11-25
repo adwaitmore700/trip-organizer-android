@@ -200,7 +200,7 @@ public class ChatRoomActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 FirebaseAuth.getInstance().signOut();
-                LoginActivity.mGoogleSignInClient.signOut();
+                MainActivity.mGoogleSignInClient.signOut();
                 SharedPreferences.Editor editor = UserProfileActivity.sp.edit();
                 editor.clear().commit();
                 GoogleSignInAccount account = null;

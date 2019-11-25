@@ -22,7 +22,8 @@ import java.util.ArrayList;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
 public  static ArrayList<UserProfile> userList;
-Boolean addflag = true;
+//Boolean addflag = true;
+public static ArrayList<UserProfile> addedUsers =new ArrayList<>();
 public UserAdapter(ArrayList<UserProfile> userList) {
         this.userList = userList;
         }
@@ -30,6 +31,7 @@ public UserAdapter(ArrayList<UserProfile> userList) {
 @NonNull
 @Override
 public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        addedUsers = new ArrayList<>();
         View view = LayoutInflater.from(parent.getContext())
         .inflate(R.layout.user_list_item,parent,false);
         UserViewHolder userViewHolder = new UserViewHolder(view);
@@ -42,22 +44,23 @@ public void onBindViewHolder(@NonNull final UserViewHolder holder, int position)
         holder.userListFullName.setText(u1.getFirstName()+" " + u1.getLastName());
         Picasso.get().load(u1.getImageUrl()).into(holder.userphoto);
 
-
         holder.addUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DocumentReference tripRef = TripProfileActivity.db.collection("Trips").document(AddUsers.tripID);
-             if(addflag){
-                tripRef.update("authorizedUsers", FieldValue.arrayUnion(u1.getUserUID()));
-                holder.addUser.setText("Remove");
-                addflag =false;
+              //  DocumentReference tripRef = TripProfileActivity.db.collection("Trips").document(AddUsers.tripID);
+             if(holder.canBeAdded){
+                 addedUsers.add(u1);
+//                tripRef.update("authorizedUsers", FieldValue.arrayUnion(u1.getUserUID()));
+              holder.addUser.setText("Remove");
+                holder.canBeAdded = false;// addflag =false;
              }
              else{
-                addflag = true;
-                 tripRef.update("authorizedUsers", FieldValue.arrayRemove(u1.getUserUID()));
+                 addedUsers.remove(addedUsers.indexOf(u1));
+                 holder.canBeAdded = true;
+                 //addflag = true;
+//                 tripRef.update("authorizedUsers", FieldValue.arrayRemove(u1.getUserUID()));
                  holder.addUser.setText("Add");
              }
-
             }
         });
         }
@@ -71,9 +74,11 @@ public static class UserViewHolder extends RecyclerView.ViewHolder{
     public TextView userListFullName;
     public Button addUser;
     public ImageView userphoto;
+    public Boolean canBeAdded;
 
     public UserViewHolder(@NonNull View itemView) {
         super(itemView);
+        canBeAdded = true;
         userListFullName = itemView.findViewById(R.id.list_user_userName);
        addUser = itemView.findViewById(R.id.userAddBtn);
         userphoto = itemView.findViewById(R.id.userImage);

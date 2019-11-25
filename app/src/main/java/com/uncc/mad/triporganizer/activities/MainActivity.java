@@ -10,8 +10,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
@@ -29,6 +34,9 @@ import java.util.Map;
 
 //Starting point of the application, this will also be the login activity
 public class MainActivity extends AppCompatActivity {
+    public static FirebaseAuth mAuth;
+    public static GoogleSignInClient mGoogleSignInClient;
+
 
     private ProgressDialog loader;
 
@@ -36,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        mAuth = FirebaseAuth.getInstance();
 //        findViewById(R.id.button2).setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
@@ -69,15 +77,41 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         loader = ProgressDialog.show(MainActivity.this, "", "Initializing ...", true);
-        new android.os.Handler().postDelayed(
-                new Runnable() {
-                    public void run() {
-                        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                        startActivity(intent);
-                        loader.dismiss();
-                        finish();
-                    }
-                }, 3000);
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if(currentUser ==null && account==null){
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(intent);
+            loader.dismiss();
+        }
+        else {
+           DocumentReference docRef = FirebaseFirestore.getInstance().collection("Users").document(mAuth.getCurrentUser().getUid());
+            if(docRef==null){
+                Intent intent = new Intent(MainActivity.this, UserProfileActivity.class);
+                startActivity(intent);
+                loader.dismiss();
+            }
+            else{
+                Intent intent = new Intent(MainActivity.this, DashboardActivity.class);
+                startActivity(intent);
+                loader.dismiss();
+            }
+
+        }
+        finish();
+
+
+
+
+//        new android.os.Handler().postDelayed(
+//                new Runnable() {
+//                    public void run() {
+//                        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+//                        startActivity(intent);
+//                        loader.dismiss();
+//                        finish();
+//                    }
+//                }, 3000);
     }
 }
 

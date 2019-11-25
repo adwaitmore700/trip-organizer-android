@@ -18,6 +18,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -39,12 +40,14 @@ import java.util.HashMap;
 
 public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripVIewHolder> {
     public  static ArrayList<Trip> tripList;
+    public static Boolean flag;
     Boolean joinFlag = true,chat=false;
 
     ArrayList<String> listOfAuthUsers = new ArrayList<>();
 
-    public TripAdapter(ArrayList<Trip> tripList) {
+    public TripAdapter(ArrayList<Trip> tripList,Boolean flag) {
         this.tripList = tripList;
+        this.flag = flag;
     }
 
     @NonNull
@@ -53,6 +56,7 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripVIewHolder
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.trip_list_item_row,parent,false);
         TripVIewHolder tripVIewHolder = new TripVIewHolder(view);
+
         return tripVIewHolder;
     }
 
@@ -73,6 +77,7 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripVIewHolder
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 deleteTrip(t1.getId(),position);
                                 Toast.makeText(view.getContext(), "Trip Deleted", Toast.LENGTH_SHORT).show();
+
                             }
                         }).setNegativeButton("No", new DialogInterface.OnClickListener() {
                     @Override
@@ -81,7 +86,10 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripVIewHolder
                     }
                 });
                AlertDialog alert = builder.create();
+               if(FirebaseAuth.getInstance().getCurrentUser().getUid().equals(t1.getAdminId()))
                 alert.show();
+               else
+                   Toast.makeText(view.getContext(), "You can't delete this trip.", Toast.LENGTH_SHORT).show();
                 return false;
             }
         });
@@ -94,12 +102,13 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripVIewHolder
                     tripRef.update("authorizedUsers", FieldValue.arrayUnion(FirebaseAuth.getInstance().getCurrentUser().getUid()));
                     holder.joinLeaveBtn.setText("Leave");
                     joinFlag =false;
-                    chat = true;
+                    //chat = true;
                 }
                 else{
                     tripRef.update("authorizedUsers", FieldValue.arrayRemove(FirebaseAuth.getInstance().getCurrentUser().getUid()));
                     joinFlag = true;
                     chat = false;
+                    listOfAuthUsers = null;
                     holder.joinLeaveBtn.setText("Join");
                 }
             }
@@ -107,37 +116,14 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripVIewHolder
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-               TripProfileActivity.db.collection("Trips").document(t1.getId())
-                       .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                   @Override
-                   public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                       if (task.isSuccessful()) {
-                           DocumentSnapshot document = task.getResult();
-                           Log.d("demo",t1.getId()+"");
-                           if (document.exists()) {
-                               listOfAuthUsers = (ArrayList<String>) document.getData().get("authorizedUsers");
-                               for (String id:listOfAuthUsers)
-                                   if(id.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
-                                       chat = true;
-                                   }
-                           } else {
-                               Log.d("demo", "No such document");
-                           }
-                       } else {
-                           Log.d("demo", "get failed with ", task.getException());
-                       }
-
-                   }
-               });
-                if(chat){
-                Intent i = new Intent(view.getContext(), ChatRoomActivity.class);
+            public void onClick(final View view) {
+                Intent i = new Intent(view.getContext(), TripProfileActivity.class);
                 i.putExtra("TRIPID", t1.getId());
                 view.getContext().startActivity(i);
-            }
-            else{
-                    Toast.makeText(view.getContext(), "You are not added in Trip yet", Toast.LENGTH_SHORT).show();}
-                    listOfAuthUsers = null;
+
+
+
+
             }
         });
     }
@@ -151,19 +137,24 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripVIewHolder
         public TextView title,location;
         public ImageView tripImage;
         public Button joinLeaveBtn;
+
     //    AlertDialog alert;
         public TripVIewHolder(@NonNull final View itemView) {
             super(itemView);
             joinLeaveBtn = itemView.findViewById(R.id.buttonJoinLeave);
+            joinLeaveBtn.setVisibility(View.INVISIBLE);
             title = itemView.findViewById(R.id.trip_item_title);
             location = itemView.findViewById(R.id.trip_item_location);
             tripImage = itemView.findViewById(R.id.trip_item_photo);
-
+            if(flag){
+                joinLeaveBtn.setVisibility(View.VISIBLE);
+            }
         }
     }
     public void deleteTrip(String document,int position){
         tripList.remove(position);
         TripProfileActivity.db.collection("Trips").document(document).delete();
         DashboardActivity.mAdapter.notifyDataSetChanged();
+        FirebaseDatabase.getInstance().getReference(document).removeValue();
     }
 }
