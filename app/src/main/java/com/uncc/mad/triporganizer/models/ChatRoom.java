@@ -27,7 +27,6 @@ public class ChatRoom {
     public void setImageUrl(String imageUrl) {
         ImageUrl = imageUrl;
     }
-
     public String getuId() {
         return uId;
     }
