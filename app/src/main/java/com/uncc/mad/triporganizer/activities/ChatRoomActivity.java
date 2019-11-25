@@ -23,6 +23,7 @@ import com.squareup.picasso.Picasso;
 import com.uncc.mad.triporganizer.R;
 import com.uncc.mad.triporganizer.models.ChatRoom;
 import android.content.Intent;
+//import android.content.SharedPreferences;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -199,14 +200,14 @@ public class ChatRoomActivity extends AppCompatActivity {
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FirebaseAuth.getInstance().signOut();
-                MainActivity.mGoogleSignInClient.signOut();
-                SharedPreferences.Editor editor = UserProfileActivity.sp.edit();
-                editor.clear().commit();
-                GoogleSignInAccount account = null;
-                Intent intent = new Intent(ChatRoomActivity.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
+                LoginActivity.mGoogleSignInClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        FirebaseAuth.getInstance().signOut();
+                        Intent intent = new Intent(ChatRoomActivity.this, MainActivity.class);
+                        finish();
+                    }
+                });
             }
         });
         Toolbar toolbar = (Toolbar) action.getCustomView().getParent();

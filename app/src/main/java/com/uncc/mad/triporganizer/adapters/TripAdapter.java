@@ -120,10 +120,6 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripVIewHolder
                 Intent i = new Intent(view.getContext(), TripProfileActivity.class);
                 i.putExtra("TRIPID", t1.getId());
                 view.getContext().startActivity(i);
-
-
-
-
             }
         });
     }

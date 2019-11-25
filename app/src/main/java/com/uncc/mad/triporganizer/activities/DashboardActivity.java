@@ -27,7 +27,7 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
+//import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -99,14 +99,20 @@ public class DashboardActivity extends AppCompatActivity {
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FirebaseAuth.getInstance().signOut();
-                LoginActivity.mGoogleSignInClient.signOut();
-                SharedPreferences.Editor editor = UserProfileActivity.sp.edit();
-                editor.clear().commit();
-                GoogleSignInAccount account = null;
-                Intent intent = new Intent(DashboardActivity.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
+               LoginActivity.mGoogleSignInClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
+                   @Override
+                   public void onComplete(@NonNull Task<Void> task) {
+                       FirebaseAuth.getInstance().signOut();
+                       Intent intent = new Intent(DashboardActivity.this, MainActivity.class);
+                       startActivity(intent);
+                       finish();
+                   }
+               });
+
+//                SharedPreferences.Editor editor = UserProfileActivity.sp.edit();
+//                editor.clear().commit();
+              // GoogleSignInAccount account = null;
+
             }
         });
         Toolbar toolbar=(Toolbar)action.getCustomView().getParent();
@@ -132,11 +138,11 @@ public class DashboardActivity extends AppCompatActivity {
                         fullName.setText(loggedinUser[0].getFirstName()+ " " + loggedinUser[0].getLastName());
                         Picasso.get().load(loggedinUser[0].getImageUrl()).into(myImage);
                         String json = gson.toJson(loggedinUser[0]);
-                        UserProfileActivity.sp = getPreferences(Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = UserProfileActivity.sp.edit();
-                        editor.clear();
-                        editor.putString("LoggedInUser", json);
-                        editor.commit();
+                       // UserProfileActivity.sp = getPreferences(Context.MODE_PRIVATE);
+//                        SharedPreferences.Editor editor = UserProfileActivity.sp.edit();
+//                        editor.clear();
+//                        editor.putString("LoggedInUser", json);
+//                        editor.commit();
                     }
                 });
 

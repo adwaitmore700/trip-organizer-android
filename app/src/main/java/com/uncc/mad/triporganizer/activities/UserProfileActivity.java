@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
+//import android.content.SharedPreferences;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -50,7 +51,7 @@ public class UserProfileActivity extends AppCompatActivity {
     String gender = null;
     public static String userID = null;
     ImageView iv_TakePhoto;
-    static SharedPreferences sp=null;
+  //  static SharedPreferences sp=null;
     DocumentReference docRef = null;
     static final int REQUEST_IMAGE_CAPTURE = 1;
     Bitmap bitmapUpload = null;
@@ -189,11 +190,11 @@ public class UserProfileActivity extends AppCompatActivity {
                     db.collection("Users").document( UID).set(user);
                     Gson gson = new Gson();
                     String json = gson.toJson(user);
-                     sp = getPreferences(Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sp.edit();
-                    editor.clear();
-                    editor.putString("LoggedInUser", json);
-                    editor.commit();
+                    // sp = getPreferences(Context.MODE_PRIVATE);
+//                    SharedPreferences.Editor editor = sp.edit();
+//                    editor.clear();
+//                    editor.putString("LoggedInUser", json);
+//                    editor.commit();
                     Intent intent = new Intent(UserProfileActivity.this, DashboardActivity.class);
                     startActivity(intent);
                     finish();

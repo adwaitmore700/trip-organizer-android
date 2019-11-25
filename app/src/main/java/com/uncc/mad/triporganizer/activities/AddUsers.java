@@ -46,7 +46,7 @@ public class AddUsers extends AppCompatActivity {
         findViewById(R.id.btnSaveTrip).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("demo",UserAdapter.addedUsers.toString());
+          //      Log.d("demo",UserAdapter.addedUsers.toString());
                // DocumentReference tripRef = TripProfileActivity.db.collection("Trips").document(tripID);
 //                tripRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
 //                    @Override
@@ -85,7 +85,16 @@ public class AddUsers extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 UserProfile userProfile = document.toObject(UserProfile.class);
-                                userList.add(userProfile);
+                                for(int i =0;i<TripProfileActivity.addedUsers.size();i++){
+//                                    if(!TripProfileActivity.addedUsers.get(i).getUserUID().equals(userProfile.userUID))
+//                                    {
+                                        userList.add(userProfile);
+//                                        break;
+//                                    }
+//                                    else{
+//                                        userList.add(userProfile);}
+                                }
+
                             }
                             if(flag == 0) {
                                 recyclerView.setLayoutManager(layoutManager);

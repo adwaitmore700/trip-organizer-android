@@ -35,9 +35,8 @@ import java.util.Map;
 //Starting point of the application, this will also be the login activity
 public class MainActivity extends AppCompatActivity {
     public static FirebaseAuth mAuth;
-    public static GoogleSignInClient mGoogleSignInClient;
-
-
+   public static GoogleSignInClient mGoogleSignInClient;
+  //  public static GoogleSignInAccount account;
     private ProgressDialog loader;
 
     @Override
@@ -78,7 +77,8 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         loader = ProgressDialog.show(MainActivity.this, "", "Initializing ...", true);
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+
         if(currentUser ==null && account==null){
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);

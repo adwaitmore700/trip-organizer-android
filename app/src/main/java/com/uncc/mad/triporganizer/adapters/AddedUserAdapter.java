@@ -20,7 +20,7 @@ import com.uncc.mad.triporganizer.models.UserProfile;
 
 import java.util.ArrayList;
 
-public class AddedUserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
+public class AddedUserAdapter extends RecyclerView.Adapter<AddedUserAdapter.UserViewHolder> {
     public  static ArrayList<UserProfile> userList;
     Boolean addflag = true;
     public AddedUserAdapter(ArrayList<UserProfile> userList) {
@@ -29,15 +29,15 @@ public class AddedUserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewH
 
     @NonNull
     @Override
-    public UserAdapter.UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public AddedUserAdapter.UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.user_list_item,parent,false);
-        UserAdapter.UserViewHolder userViewHolder = new UserAdapter.UserViewHolder(view);
+        AddedUserAdapter.UserViewHolder userViewHolder = new AddedUserAdapter.UserViewHolder(view);
         return userViewHolder;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final UserAdapter.UserViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
         final UserProfile u1 = userList.get(position);
         holder.userListFullName.setText(u1.getFirstName()+" " + u1.getLastName());
         Picasso.get().load(u1.getImageUrl()).into(holder.userphoto);
@@ -50,13 +50,14 @@ public class AddedUserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewH
 
     public static class UserViewHolder extends RecyclerView.ViewHolder{
         public TextView userListFullName;
-
         public ImageView userphoto;
-
+        public Button add;
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
             userListFullName = itemView.findViewById(R.id.list_user_userName);
             userphoto = itemView.findViewById(R.id.userImage);
+            add = itemView.findViewById(R.id.userAddBtn);
+            add.setVisibility(View.INVISIBLE);
         }
     }
 }

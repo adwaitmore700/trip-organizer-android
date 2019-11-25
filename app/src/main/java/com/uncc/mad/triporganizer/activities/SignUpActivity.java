@@ -52,7 +52,7 @@ public class SignUpActivity extends AppCompatActivity {
                                     if (task.isSuccessful()) {
                                         Toast.makeText(SignUpActivity.this, "Sign Up Successfull", Toast.LENGTH_SHORT).show();
                                         FirebaseUser user = mAuth.getCurrentUser();
-                                        Intent intent = new Intent(SignUpActivity.this, TripProfileActivity.class);
+                                        Intent intent = new Intent(SignUpActivity.this, UserProfileActivity.class);
                                         startActivity(intent);
 
                                     } else {
@@ -72,7 +72,7 @@ public class SignUpActivity extends AppCompatActivity {
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser !=null){
-            Intent intent = new Intent(SignUpActivity.this, TripProfileActivity.class);
+            Intent intent = new Intent(SignUpActivity.this, UserProfileActivity.class);
             startActivity(intent);
         }
 
