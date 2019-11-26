@@ -22,19 +22,26 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 import com.uncc.mad.triporganizer.R;
 import com.uncc.mad.triporganizer.models.ChatRoom;
+
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
-//import android.content.SharedPreferences;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.format.DateFormat;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 
@@ -45,33 +52,62 @@ public class ChatRoomActivity extends AppCompatActivity {
     private FirebaseListAdapter<ChatRoom> adapter;
     Bitmap bitmapUpload = null;
     String imageURL;
+    private ProgressDialog loader;
+    private ListView listOfMessages;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
         setCustomActionBar();
+        showLoader(false);
         Intent intent = getIntent();
         if (intent != null && intent.getExtras() != null) {
             tripDB = intent.getStringExtra("TRIPID");
         }
-
-
         findViewById(R.id.cr_iv_capture_image).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 takePhotoIntent();
             }
         });
-
         findViewById(R.id.cr_iv_send_message).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendMessageOrAttachment("Text", null);
+                InputMethodManager inputMethodManager =(InputMethodManager)getSystemService(Activity.INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                if(!((EditText) findViewById(R.id.cr_et_enter_message)).getText().toString().trim().equals("")){
+                    if(isConnected()){
+                        sendMessageOrAttachment("Text", null);
+                    }
+                    else {
+                        Toast.makeText(ChatRoomActivity.this, "No internet connection", Toast.LENGTH_SHORT).show();
+                    }
+                }
             }
         });
 
-        ListView listOfMessages = (ListView) findViewById(R.id.cr_rv_messages_list);
+        initializeList();
+        loader.dismiss();
+    }
+
+    private void showLoader(boolean shortDuration){
+        if(isConnected()){
+            loader = ProgressDialog.show(ChatRoomActivity.this, "", "Loading messages...", true);
+            new android.os.Handler().postDelayed(
+                    new Runnable() {
+                        public void run() {
+                            loader.dismiss();
+                        }
+                    }, shortDuration ? 1500 : 3000);
+        }
+        else{
+            Toast.makeText(ChatRoomActivity.this, "Messages will be loaded when internet connection is restored", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void initializeList(){
+        listOfMessages = (ListView) findViewById(R.id.cr_rv_messages_list);
         FirebaseListOptions<ChatRoom> options = new FirebaseListOptions.Builder<ChatRoom>()
                 .setLayout(R.layout.message_list_item_row)//Note: The guide doesn't mention this method, without it an exception is thrown that the layout has to be set.
                 .setLifecycleOwner(this)
@@ -123,6 +159,14 @@ public class ChatRoomActivity extends AppCompatActivity {
             }
         };
         listOfMessages.setAdapter(adapter);
+        listOfMessages.scrollTo(0,listOfMessages.getMaxScrollAmount());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        showLoader(true);
+        initializeList();
     }
 
     private void takePhotoIntent() {
@@ -159,6 +203,16 @@ public class ChatRoomActivity extends AppCompatActivity {
         });
     }
 
+    public boolean isConnected() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if (networkInfo == null || !networkInfo.isConnected() || (networkInfo.getType() != ConnectivityManager.TYPE_WIFI
+                && networkInfo.getType() != connectivityManager.TYPE_MOBILE)) {
+            return false;
+        }
+        return true;
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -166,7 +220,13 @@ public class ChatRoomActivity extends AppCompatActivity {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             bitmapUpload = imageBitmap;
-            uploadImage(imageBitmap, FirebaseAuth.getInstance().getCurrentUser().getUid());
+            if(isConnected()){
+                uploadImage(imageBitmap,FirebaseAuth.getInstance().getCurrentUser().getUid());
+            }
+            else {
+                Toast.makeText(ChatRoomActivity.this, "No internet connection", Toast.LENGTH_SHORT).show();
+            }
+
         }
     }
 
@@ -178,7 +238,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         chat.setUserId(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
         if (messageType.equals("Text")) {
             EditText input = (EditText) findViewById(R.id.cr_et_enter_message);
-            chat.setMessages(input.getText().toString());
+            chat.setMessages(input.getText().toString().trim());
             chat.setMessageType(messageType);
             input.setText("");
         } else {
@@ -187,16 +247,17 @@ public class ChatRoomActivity extends AppCompatActivity {
         }
         tripChat.push()
                 .setValue(chat);
+        listOfMessages.smoothScrollToPosition(adapter.getCount());
     }
 
-    private void setCustomActionBar() {
+    private void setCustomActionBar(){
         ActionBar action = getSupportActionBar();
         action.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         action.setDisplayShowCustomEnabled(true);
         action.setCustomView(R.layout.custom_action_bar);
-        ImageView imageButton = (ImageView) action.getCustomView().findViewById(R.id.btn_logout);
+        ImageView imageButton= (ImageView)action.getCustomView().findViewById(R.id.btn_logout);
         TextView pageTitle = action.getCustomView().findViewById(R.id.action_bar_title);
-        pageTitle.setText("MESSAGES");
+        pageTitle.setText("DASHBOARD");
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -205,16 +266,32 @@ public class ChatRoomActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Void> task) {
                         FirebaseAuth.getInstance().signOut();
                         Intent intent = new Intent(ChatRoomActivity.this, MainActivity.class);
+                        startActivity(intent);
                         finish();
                     }
                 });
             }
         });
-        Toolbar toolbar = (Toolbar) action.getCustomView().getParent();
+        ImageView profileImage = action.getCustomView().findViewById(R.id.iv_profile_photo);
+        Uri uri = FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl();
+        if(uri == null){
+            profileImage.setImageDrawable(getDrawable(R.drawable.default_avatar_icon));
+        }
+        else{
+            Picasso.get().load(uri).into(profileImage);
+        }
+        ConstraintLayout profileContainer = action.getCustomView().findViewById(R.id.my_profile);
+        profileContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(ChatRoomActivity.this, UserProfileActivity.class);
+                startActivity(intent);
+            }
+        });
+        Toolbar toolbar=(Toolbar)action.getCustomView().getParent();
         toolbar.setContentInsetsAbsolute(0, 0);
         toolbar.getContentInsetEnd();
         toolbar.setPadding(0, 0, 0, 0);
         getWindow().setStatusBarColor(getColor(R.color.primaryDarkColor));
     }
-
 }

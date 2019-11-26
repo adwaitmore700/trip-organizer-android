@@ -6,16 +6,15 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.firebase.ui.database.FirebaseListAdapter;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -26,36 +25,21 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 import com.uncc.mad.triporganizer.R;
 import com.uncc.mad.triporganizer.adapters.AddedUserAdapter;
-import com.uncc.mad.triporganizer.adapters.TripAdapter;
-import com.uncc.mad.triporganizer.adapters.UserAdapter;
-import com.uncc.mad.triporganizer.models.ChatRoom;
 import com.uncc.mad.triporganizer.models.Trip;
 import com.uncc.mad.triporganizer.models.UserProfile;
-
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-//import android.content.SharedPreferences;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -71,6 +55,7 @@ public class TripProfileActivity extends AppCompatActivity {
     Boolean joinFlag = true,chat=false;
    public static FirebaseFirestore db = FirebaseFirestore.getInstance();
     String ADDUSER = "AddUser";
+    FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
   // ImageView iv_TakePhoto;
     Button invite,chatRoom,joinBtn,delete;
@@ -110,14 +95,14 @@ public class TripProfileActivity extends AppCompatActivity {
             public void onClick(View view) {
                 DocumentReference tripRef = TripProfileActivity.db.collection("Trips").document(tripID);
                 if(joinFlag){
-                    tripRef.update("authUsersId", FieldValue.arrayUnion(FirebaseAuth.getInstance().getCurrentUser().getUid()));
+                    tripRef.update("authUsersId", FieldValue.arrayUnion(currentUser.getUid()));
                     joinBtn.setText("Leave");
                   //  Adapter.notifyDataSetChanged();
                     joinFlag =false;
                     chat = true;
                 }
                 else{
-                    tripRef.update("authUsersId", FieldValue.arrayRemove(FirebaseAuth.getInstance().getCurrentUser().getUid()));
+                    tripRef.update("authUsersId", FieldValue.arrayRemove(currentUser.getUid()));
                     joinFlag = true;
                     chat = false;
                     joinBtn.setText("Join");
@@ -264,9 +249,9 @@ public class TripProfileActivity extends AppCompatActivity {
                     trip.setId(tripTitle);
                     trip.setTitle(tripTitle);
                     trip.setTripImageUrl(imageURL);
-                    addedUserID.add(MainActivity.mAuth.getCurrentUser().getUid());
+                    addedUserID.add(currentUser.getUid());
                     trip.setAuthUsersId(addedUserID);
-                    trip.setAdminId(MainActivity.mAuth.getCurrentUser().getUid());
+                    trip.setAdminId(currentUser.getUid());
                    trip.setLocationLatitude(Double.parseDouble(lati.getText().toString()));
                     trip.setLocationLongitude(Double.parseDouble(longi.getText().toString()));
                     db.collection("Trips").document(tripTitle).set(trip);
@@ -286,7 +271,7 @@ public class TripProfileActivity extends AppCompatActivity {
         action.setCustomView(R.layout.custom_action_bar);
         ImageView imageButton= (ImageView)action.getCustomView().findViewById(R.id.btn_logout);
         TextView pageTitle = action.getCustomView().findViewById(R.id.action_bar_title);
-        pageTitle.setText("TRIP DETAILS");
+        pageTitle.setText("DASHBOARD");
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -301,12 +286,29 @@ public class TripProfileActivity extends AppCompatActivity {
                 });
             }
         });
+        ImageView profileImage = action.getCustomView().findViewById(R.id.iv_profile_photo);
+        Uri uri = FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl();
+        if(uri == null){
+            profileImage.setImageDrawable(getDrawable(R.drawable.default_avatar_icon));
+        }
+        else{
+            Picasso.get().load(uri).into(profileImage);
+        }
+        ConstraintLayout profileContainer = action.getCustomView().findViewById(R.id.my_profile);
+        profileContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(TripProfileActivity.this, UserProfileActivity.class);
+                startActivity(intent);
+            }
+        });
         Toolbar toolbar=(Toolbar)action.getCustomView().getParent();
         toolbar.setContentInsetsAbsolute(0, 0);
         toolbar.getContentInsetEnd();
         toolbar.setPadding(0, 0, 0, 0);
         getWindow().setStatusBarColor(getColor(R.color.primaryDarkColor));
     }
+
     public void setTrip(final String trip){
         TripProfileActivity.db.collection("Trips").document(trip)
                 .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -337,7 +339,7 @@ public class TripProfileActivity extends AppCompatActivity {
                                         recyclerView.setAdapter(Adapter);
                                     }
                                 for (int i=0;i<authIDs.size();i++){
-                                    if(authIDs.get(i).equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
+                                    if(authIDs.get(i).equals(currentUser.getUid())){
                                         chat = true;
                                         joinBtn.setText("Leave");
                                         joinFlag =false;
@@ -347,7 +349,7 @@ public class TripProfileActivity extends AppCompatActivity {
                             }
                         });
 
-                if(FirebaseAuth.getInstance().getCurrentUser().getUid().equals(trip.adminId)){
+                if(currentUser.getUid().equals(trip.adminId)){
                     joinBtn.setVisibility(View.INVISIBLE);
                     invite.setVisibility(View.VISIBLE);
                     delete.setVisibility(View.VISIBLE);

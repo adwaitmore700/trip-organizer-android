@@ -64,7 +64,9 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripVIewHolder
     public void onBindViewHolder(@NonNull final TripVIewHolder holder, final int position) {
         final Trip t1 = tripList.get(position);
         holder.title.setText(t1.getTitle());
-        holder.location.setText(t1.getLocationLatitude()+","+t1.getLocationLongitude());
+        holder.location.setText("Latitude : " + t1.getLocationLatitude()+"  ,  "+"Longitude : "+t1.getLocationLongitude());
+        Integer size = t1.getAuthUsersId().size();
+        holder.memberCount.setText(size.toString());
         Picasso.get().load(t1.getTripImageUrl()).into(holder.tripImage);
 
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
@@ -94,25 +96,25 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripVIewHolder
             }
         });
 
-        holder.joinLeaveBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                DocumentReference tripRef = TripProfileActivity.db.collection("Trips").document(t1.getId());
-                if(joinFlag){
-                    tripRef.update("authorizedUsers", FieldValue.arrayUnion(FirebaseAuth.getInstance().getCurrentUser().getUid()));
-                    holder.joinLeaveBtn.setText("Leave");
-                    joinFlag =false;
-                    //chat = true;
-                }
-                else{
-                    tripRef.update("authorizedUsers", FieldValue.arrayRemove(FirebaseAuth.getInstance().getCurrentUser().getUid()));
-                    joinFlag = true;
-                    chat = false;
-                    listOfAuthUsers = null;
-                    holder.joinLeaveBtn.setText("Join");
-                }
-            }
-        });
+//        holder.joinLeaveBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                DocumentReference tripRef = TripProfileActivity.db.collection("Trips").document(t1.getId());
+//                if(joinFlag){
+//                    tripRef.update("authorizedUsers", FieldValue.arrayUnion(FirebaseAuth.getInstance().getCurrentUser().getUid()));
+//                    holder.joinLeaveBtn.setText("Leave");
+//                    joinFlag =false;
+//                    //chat = true;
+//                }
+//                else{
+//                    tripRef.update("authorizedUsers", FieldValue.arrayRemove(FirebaseAuth.getInstance().getCurrentUser().getUid()));
+//                    joinFlag = true;
+//                    chat = false;
+//                    listOfAuthUsers = null;
+//                    holder.joinLeaveBtn.setText("Join");
+//                }
+//            }
+//        });
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -130,21 +132,22 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripVIewHolder
     }
 
     public static class TripVIewHolder extends RecyclerView.ViewHolder{
-        public TextView title,location;
+        public TextView title,location,memberCount;
         public ImageView tripImage;
         public Button joinLeaveBtn;
 
     //    AlertDialog alert;
         public TripVIewHolder(@NonNull final View itemView) {
             super(itemView);
-            joinLeaveBtn = itemView.findViewById(R.id.buttonJoinLeave);
-            joinLeaveBtn.setVisibility(View.INVISIBLE);
+            //joinLeaveBtn = itemView.findViewById(R.id.buttonJoinLeave);
+            //joinLeaveBtn.setVisibility(View.INVISIBLE);
             title = itemView.findViewById(R.id.trip_item_title);
             location = itemView.findViewById(R.id.trip_item_location);
+            memberCount = itemView.findViewById(R.id.trip_item_memberCount);
             tripImage = itemView.findViewById(R.id.trip_item_photo);
-            if(flag){
-                joinLeaveBtn.setVisibility(View.VISIBLE);
-            }
+//            if(flag){
+//                joinLeaveBtn.setVisibility(View.VISIBLE);
+//            }
         }
     }
     public void deleteTrip(String document,int position){

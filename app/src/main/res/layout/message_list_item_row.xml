@@ -5,15 +5,20 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="10dp">
+    android:paddingLeft="10sp"
+    android:paddingTop="10sp"
+    android:paddingRight="10sp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/r_message_item_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginEnd="100dp"
-        android:background="#C4C3C3"
-        app:layout_constraintEnd_toEndOf="parent">
+        android:background="#6DA8E6"
+        app:layout_constraintBottom_toTopOf="@+id/s_message_item_container"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/r_message_item_photo"
@@ -45,6 +50,8 @@
             android:ems="10"
             android:gravity="start|top"
             android:textAlignment="textStart"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
             app:layout_constraintBottom_toTopOf="@+id/r_message_item_status"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -56,9 +63,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="5dp"
+            android:paddingTop="10sp"
             android:text="Dummy"
-            android:textSize="12sp"
+            android:textColor="#FFFFFF"
+            android:textSize="10sp"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -68,9 +77,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="5dp"
+            android:paddingTop="5sp"
             android:text="Sent"
-            android:textSize="12sp"
+            android:textColor="#FFFFFF"
+            android:textSize="10sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -79,9 +90,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
+            android:paddingTop="5sp"
+            android:paddingBottom="5sp"
             android:text="Adwait More"
-            android:textSize="12sp"
+            android:textColor="#FFFFFF"
+            android:textSize="10sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -94,7 +107,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="100dp"
-        android:background="#CDDC39"
+        android:background="#316CA8"
         app:layout_constraintStart_toStartOf="parent">
 
         <ImageView
@@ -127,6 +140,8 @@
             android:ems="10"
             android:gravity="start|top"
             android:textAlignment="textEnd"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
             app:layout_constraintBottom_toTopOf="@+id/s_message_item_status"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -138,9 +153,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="5dp"
+            android:paddingTop="10sp"
             android:text="Dummy"
-            android:textSize="12sp"
+            android:textColor="#FFFFFF"
+            android:textSize="10sp"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -150,9 +167,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="5dp"
+            android:paddingTop="5sp"
             android:text="Sent"
-            android:textSize="12sp"
+            android:textColor="#FFFFFF"
+            android:textSize="10sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -160,10 +179,12 @@
             android:id="@+id/s_message_item_sender_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
+            android:paddingTop="5sp"
+            android:paddingBottom="5sp"
             android:text="Adwait More"
-            android:textSize="12sp"
+            android:textColor="#FFFFFF"
+            android:textSize="10sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

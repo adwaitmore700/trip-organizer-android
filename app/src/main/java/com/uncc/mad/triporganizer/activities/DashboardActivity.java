@@ -4,10 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -25,9 +25,9 @@ import com.uncc.mad.triporganizer.models.UserProfile;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 //import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -37,9 +37,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 public class DashboardActivity extends AppCompatActivity {
-    TextView fullName;
-    TextView gender;
-    ImageView myImage;
     ProgressDialog pb;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     RecyclerView recyclerView;
@@ -54,18 +51,9 @@ public class DashboardActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
-
         setCustomActionBar();
-
         initialize();
 
-        findViewById(R.id.db_iv_edit_profile).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(DashboardActivity.this, UserProfileActivity.class);
-                startActivity(intent);
-            }
-        });
 
         findViewById(R.id.db_add_trip_container).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,16 +63,16 @@ public class DashboardActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.db_join_trip_container).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                joinTrip =( joinTrip == true) ?  false : true;
-                mAdapter = new TripAdapter(tripList,joinTrip);
-                recyclerView.setAdapter(mAdapter);
-                mAdapter.notifyDataSetChanged();
-
-            }
-        });
+//        findViewById(R.id.db_join_trip_container).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                joinTrip =( joinTrip == true) ?  false : true;
+//                mAdapter = new TripAdapter(tripList,joinTrip);
+//                recyclerView.setAdapter(mAdapter);
+//                mAdapter.notifyDataSetChanged();
+//
+//            }
+//        });
 
     }
 
@@ -108,11 +96,22 @@ public class DashboardActivity extends AppCompatActivity {
                        finish();
                    }
                });
-
-//                SharedPreferences.Editor editor = UserProfileActivity.sp.edit();
-//                editor.clear().commit();
-              // GoogleSignInAccount account = null;
-
+            }
+        });
+        ImageView profileImage = action.getCustomView().findViewById(R.id.iv_profile_photo);
+        Uri uri = FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl();
+        if(uri == null){
+            profileImage.setImageDrawable(getDrawable(R.drawable.default_avatar_icon));
+        }
+        else{
+            Picasso.get().load(uri).into(profileImage);
+        }
+        ConstraintLayout profileContainer = action.getCustomView().findViewById(R.id.my_profile);
+        profileContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(DashboardActivity.this, UserProfileActivity.class);
+                startActivity(intent);
             }
         });
         Toolbar toolbar=(Toolbar)action.getCustomView().getParent();
@@ -124,28 +123,6 @@ public class DashboardActivity extends AppCompatActivity {
 
     @SuppressLint("WrongViewCast")
     public void initialize(){
-        gender = findViewById(R.id.db_tv_gender_text);
-        fullName = findViewById(R.id.db_tv_fullName_text);
-        myImage = findViewById(R.id.db_iv_profile_photo);
-        final Gson gson = new Gson();
-        final UserProfile[] loggedinUser = {null};
-        FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                       loggedinUser[0] = documentSnapshot.toObject(UserProfile.class);
-                        gender.setText(loggedinUser[0].getUserGender());
-                        fullName.setText(loggedinUser[0].getFirstName()+ " " + loggedinUser[0].getLastName());
-                        Picasso.get().load(loggedinUser[0].getImageUrl()).into(myImage);
-                        String json = gson.toJson(loggedinUser[0]);
-                       // UserProfileActivity.sp = getPreferences(Context.MODE_PRIVATE);
-//                        SharedPreferences.Editor editor = UserProfileActivity.sp.edit();
-//                        editor.clear();
-//                        editor.putString("LoggedInUser", json);
-//                        editor.commit();
-                    }
-                });
-
         recyclerView = findViewById(R.id.usersRecyclerView);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(DashboardActivity.this);

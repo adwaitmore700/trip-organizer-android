@@ -68,6 +68,8 @@ public class LoginActivity extends AppCompatActivity {
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                username.setText("");
+                password.setText("");
                 Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
                 startActivity(intent);
             }
@@ -76,32 +78,38 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String userName = username.getText().toString();
-                String pass = password.getText().toString();
-                if (validateFormData(userName, pass)) {
-                    if (isConnected()) {
-                        mAuth.signInWithEmailAndPassword(userName, pass)
-                                .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<AuthResult> task) {
-                                        if (task.isSuccessful()) {
-                                            loader = ProgressDialog.show(LoginActivity.this, "", "Initializing ...", true);
-                                            Intent intent = new Intent(LoginActivity.this, UserProfileActivity.class);
-                                            startActivity(intent);
-                                            loader.dismiss();
-                                            finish();
-                                        } else {
-                                            Log.d("demo", "signInWithEmail:failure", task.getException());
-                                            Toast.makeText(LoginActivity.this, "Invalid Credentials", Toast.LENGTH_SHORT).show();
+                try{
+                    String userName = username.getText().toString().trim();
+                    String pass = password.getText().toString().trim();
+                    if (validateFormData(userName, pass)) {
+                        if (isConnected()) {
+                            loader = ProgressDialog.show(LoginActivity.this, "", "Signing in...", true);
+                            mAuth.signInWithEmailAndPassword(userName, pass)
+                                    .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<AuthResult> task) {
+                                            if (task.isSuccessful()) {
+                                                Intent intent = new Intent(LoginActivity.this, UserProfileActivity.class);
+                                                startActivity(intent);
+                                                loader.dismiss();
+                                                finish();
+                                            } else {
+                                                loader.dismiss();
+                                                Log.d("demo", "signInWithEmail:failure", task.getException());
+                                                Toast.makeText(LoginActivity.this, "Invalid Credentials", Toast.LENGTH_SHORT).show();
+                                            }
                                         }
-                                    }
-                                });
-                    } else {
-                        Toast.makeText(LoginActivity.this, "No internet connection", Toast.LENGTH_SHORT).show();
-                    }
+                                    });
+                        } else {
+                            Toast.makeText(LoginActivity.this, "No internet connection", Toast.LENGTH_SHORT).show();
+                        }
 
-                } else {
-                    Toast.makeText(LoginActivity.this, "Fields cannot be blank", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(LoginActivity.this, "Fields cannot be blank", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                catch(Exception ex){
+                    Toast.makeText(LoginActivity.this, "Something went wrong. Please try again", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -143,6 +151,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         if (isConnected()) {
+            loader = ProgressDialog.show(LoginActivity.this, "", "Signing in...", true);
             try {
                 GoogleSignInAccount account = completedTask.getResult(ApiException.class);
                 AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
@@ -151,18 +160,19 @@ public class LoginActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             Log.d("demo", "signInWithCredential:success");
-                            loader = ProgressDialog.show(LoginActivity.this, "", "Initializing ...", true);
                             Intent intent = new Intent(LoginActivity.this, UserProfileActivity.class);
                             startActivity(intent);
                             loader.dismiss();
                             finish();
                         } else {
+                            loader.dismiss();
                             Log.w("demo", "signInWithCredential:failure", task.getException());
                             Toast.makeText(LoginActivity.this, "Google sign in failed", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
             } catch (ApiException e) {
+                loader.dismiss();
                 Log.w("demo", "signInResult:failed code=" + e.toString());
                 Toast.makeText(LoginActivity.this, "Google sign in failed", Toast.LENGTH_SHORT).show();
             }
