@@ -4,15 +4,16 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -20,16 +21,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.uncc.mad.triporganizer.R;
-import com.uncc.mad.triporganizer.models.UserProfile;
 
 public class LoginActivity extends AppCompatActivity {
     public static FirebaseAuth mAuth;
@@ -40,8 +36,6 @@ public class LoginActivity extends AppCompatActivity {
     private TextView password;
     private TextView signup;
     private ProgressDialog loader;
-    FirebaseUser currentUser =null;
-    public GoogleSignInAccount account = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +61,7 @@ public class LoginActivity extends AppCompatActivity {
                     case R.id.sign_in_button:
                         signIn();
                         break;
-            }
+                }
             }
         });
 
@@ -82,62 +76,61 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (isNull()) {
-                    String userName = username.getText().toString();
-                    String pass = password.getText().toString();
-                    mAuth.signInWithEmailAndPassword(userName, pass)
-                            .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                    if (task.isSuccessful()) {
-                                        loader = ProgressDialog.show(LoginActivity.this, "", "Initializing ...", true);
-                                         Intent intent = new Intent(LoginActivity.this, UserProfileActivity.class);
-                        startActivity(intent);
-                        loader.dismiss();
-                        finish();
-                                    } else {
-                                        Log.d("demo", "signInWithEmail:failure", task.getException());
-                                        Toast.makeText(LoginActivity.this, "Invalid Credentials", Toast.LENGTH_SHORT).show();
+                String userName = username.getText().toString();
+                String pass = password.getText().toString();
+                if (validateFormData(userName, pass)) {
+                    if (isConnected()) {
+                        mAuth.signInWithEmailAndPassword(userName, pass)
+                                .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<AuthResult> task) {
+                                        if (task.isSuccessful()) {
+                                            loader = ProgressDialog.show(LoginActivity.this, "", "Initializing ...", true);
+                                            Intent intent = new Intent(LoginActivity.this, UserProfileActivity.class);
+                                            startActivity(intent);
+                                            loader.dismiss();
+                                            finish();
+                                        } else {
+                                            Log.d("demo", "signInWithEmail:failure", task.getException());
+                                            Toast.makeText(LoginActivity.this, "Invalid Credentials", Toast.LENGTH_SHORT).show();
+                                        }
                                     }
-                                }
-                            });
-                }
-                else
+                                });
+                    } else {
+                        Toast.makeText(LoginActivity.this, "No internet connection", Toast.LENGTH_SHORT).show();
+                    }
+
+                } else {
                     Toast.makeText(LoginActivity.this, "Fields cannot be blank", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
 
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//        loader = ProgressDialog.show(LoginActivity.this, "", "Initializing ...", true);
-//         currentUser = mAuth.getCurrentUser();
-//         account = GoogleSignIn.getLastSignedInAccount(this);
-//        if(currentUser !=null || account!=null){
-//           startIntent();
-//        }
-//        else{
-//            loader.dismiss();
-//            Toast.makeText(LoginActivity.this, "Login to proceed", Toast.LENGTH_SHORT).show();}
-//    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    public Boolean isNull(){
-        if((!username.getText().toString().equals("") && !password.getText().toString().equals(""))
-        && (username.getText().toString() != null && password.getText().toString() != null))
-        return true;
-        else
-        return false;
-    }
-        private void signIn() {
-            Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-            startActivityForResult(signInIntent, RC_SIGN_IN);
+    private boolean validateFormData(String username, String password) {
+        if (username.equals(null) || username.equals("")) {
+            return false;
+        } else if (password.equals(null) || password.equals("")) {
+            return false;
+        } else {
+            return true;
         }
+    }
+
+    public boolean isConnected() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if (networkInfo == null || !networkInfo.isConnected() || (networkInfo.getType() != ConnectivityManager.TYPE_WIFI
+                && networkInfo.getType() != connectivityManager.TYPE_MOBILE)) {
+            return false;
+        }
+        return true;
+    }
+
+    private void signIn() {
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -147,56 +140,34 @@ public class LoginActivity extends AppCompatActivity {
             handleSignInResult(task);
         }
     }
+
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
-        try {
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
-            mAuth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    if (task.isSuccessful()) {
-                        Log.d("demo", "signInWithCredential:success");
-                        loader = ProgressDialog.show(LoginActivity.this, "", "Initializing ...", true);
-                        Intent intent = new Intent(LoginActivity.this, UserProfileActivity.class);
-                        startActivity(intent);
-                        loader.dismiss();
-                        finish();
-                    } else {
-                        Log.w("demo", "signInWithCredential:failure", task.getException());
+        if (isConnected()) {
+            try {
+                GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+                AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
+                mAuth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            Log.d("demo", "signInWithCredential:success");
+                            loader = ProgressDialog.show(LoginActivity.this, "", "Initializing ...", true);
+                            Intent intent = new Intent(LoginActivity.this, UserProfileActivity.class);
+                            startActivity(intent);
+                            loader.dismiss();
+                            finish();
+                        } else {
+                            Log.w("demo", "signInWithCredential:failure", task.getException());
+                            Toast.makeText(LoginActivity.this, "Google sign in failed", Toast.LENGTH_SHORT).show();
+                        }
                     }
-                }
-            });
-        } catch (ApiException e) {
-            Log.w("demo", "signInResult:failed code=" + e.toString());
-           Toast.makeText(LoginActivity.this, "Login Failed", Toast.LENGTH_SHORT).show();
+                });
+            } catch (ApiException e) {
+                Log.w("demo", "signInResult:failed code=" + e.toString());
+                Toast.makeText(LoginActivity.this, "Google sign in failed", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Toast.makeText(LoginActivity.this, "No internet connection", Toast.LENGTH_SHORT).show();
         }
     }
-
-//    public void startIntent(){
-////        String user = null;
-//        currentUser = mAuth.getCurrentUser();
-//        account = GoogleSignIn.getLastSignedInAccount(this);
-//        user = mAuth.getCurrentUser().getUid();
-//        TripProfileActivity.db.collection("Users").document(user)
-//        .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//            @Override
-//            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                if (task.isSuccessful()) {
-//                    DocumentSnapshot document = task.getResult();
-//                    if (document.exists()) {
-//                        Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
-//                        startActivity(intent);
-//                        loader.dismiss();
-//                        finish();
-//                    } else {
-//
-//                        finish();
-//                    }
-//                } else {
-//                    loader.dismiss();
-//                    Log.d("demo", "get failed with ", task.getException());
-//                }
-//            }
-//        });
-//    }
 }
