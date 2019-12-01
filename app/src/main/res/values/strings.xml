@@ -20,4 +20,15 @@
     <string name="lngLabel">Longitiude</string>
     <string name="saveTrip">Save Trip</string>
     <string name="AddLabel">Add</string>
+    <string name="invite_users_label">Invite</string>
+    <string name="sign_up_button_text">Not a user ? Sign Up here!!</string>
+    <string name="male_label_text">Male</string>
+    <string name="female_label_text">Female</string>
+    <string name="upload_image_label_text">Upload Image</string>
+    <string name="chat_room_button_text">Chat Room</string>
+    <string name="invite_users_button_text">Invite Users</string>
+    <string name="invited_users_list_label_text">List of users invited :</string>
+    <string name="join_button_text">Join</string>
+    <string name="delete_trip_button_text">Delete Trip</string>
+    <string name="total_user_label_text">Total Users</string>
 </resources>

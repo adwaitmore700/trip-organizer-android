@@ -3,6 +3,7 @@ package com.uncc.mad.triporganizer.activities;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -26,6 +27,7 @@ import com.uncc.mad.triporganizer.models.ChatRoom;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -35,8 +37,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -44,6 +48,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Map;
 
 public class ChatRoomActivity extends AppCompatActivity {
     FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -54,6 +59,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     String imageURL;
     private ProgressDialog loader;
     private ListView listOfMessages;
+    private String currentUserId="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +67,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat_room);
         setCustomActionBar();
         showLoader(false);
+        currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         Intent intent = getIntent();
         if (intent != null && intent.getExtras() != null) {
             tripDB = intent.getStringExtra("TRIPID");
@@ -115,8 +122,9 @@ public class ChatRoomActivity extends AppCompatActivity {
                 .build();
         adapter = new FirebaseListAdapter<ChatRoom>(options) {
             @Override
-            protected void populateView(@NonNull View v, @NonNull ChatRoom model, int position) {
+            protected void populateView(@NonNull View v, @NonNull ChatRoom model, final int position) {
                 String temp = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                Log.d("demo",model+"");
                 ConstraintLayout container1 = v.findViewById(R.id.r_message_item_container);
                 ConstraintLayout container2 = v.findViewById(R.id.s_message_item_container);
                 if (model.getuId().equals(temp)) {
@@ -156,10 +164,60 @@ public class ChatRoomActivity extends AppCompatActivity {
                     messageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)", model.getTime()));
                     status.setText("Received");
                 }
+//                v.setOnLongClickListener(new View.OnLongClickListener() {
+//                    @Override
+//                    public boolean onLongClick(View view) {
+//
+//                       item.getUserId();
+//
+//                        Log.d("demo",item+"");
+//                        return false;
+//                    }
+//                });
             }
+
         };
         listOfMessages.setAdapter(adapter);
+        listOfMessages.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                ChatRoom item =  adapter.getItem(i);
+                if(item.getuId().equals(currentUserId)){
+                    showDeleteMessageDialog(item);
+                }
+                return false;
+            }
+        });
         listOfMessages.scrollTo(0,listOfMessages.getMaxScrollAmount());
+    }
+
+    private void showDeleteMessageDialog(final ChatRoom item){
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            alertDialogBuilder.setMessage("Do you want to delete the selected message ?");
+                    alertDialogBuilder.setPositiveButton("Yes",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface arg0, int arg1) {
+                                    try{
+                                        String mId = item.getMessageId();
+                                        DatabaseReference tripChat = database.getReference(item.getMessageId());
+                                        tripChat.removeValue();
+                                        Toast.makeText(ChatRoomActivity.this,"Message deleted",Toast.LENGTH_LONG).show();
+                                    }
+                                    catch(Exception ex){
+                                        Toast.makeText(ChatRoomActivity.this,"Error while deleting message",Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                            });
+
+            alertDialogBuilder.setNegativeButton("No",new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    //do nothing
+                }
+            });
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
     }
 
     @Override
@@ -235,7 +293,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         ChatRoom chat = new ChatRoom();
         chat.setTime();
         chat.setuId(FirebaseAuth.getInstance().getCurrentUser().getUid());
-        chat.setUserId(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+       chat.setUserId(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
         if (messageType.equals("Text")) {
             EditText input = (EditText) findViewById(R.id.cr_et_enter_message);
             chat.setMessages(input.getText().toString().trim());
@@ -245,8 +303,11 @@ public class ChatRoomActivity extends AppCompatActivity {
             chat.setMessageType("Image");
             chat.setImageUrl(imageUrl);
         }
-        tripChat.push()
-                .setValue(chat);
+        String msgKey = tripChat.push().getKey();
+      //  tripDB = ;
+        chat.setMessageId(tripDB + "/" + msgKey);
+       // tripDB = ;
+        database.getReference(tripDB).child(msgKey).setValue(chat);
         listOfMessages.smoothScrollToPosition(adapter.getCount());
     }
 
@@ -257,19 +318,21 @@ public class ChatRoomActivity extends AppCompatActivity {
         action.setCustomView(R.layout.custom_action_bar);
         ImageView imageButton= (ImageView)action.getCustomView().findViewById(R.id.btn_logout);
         TextView pageTitle = action.getCustomView().findViewById(R.id.action_bar_title);
-        pageTitle.setText("DASHBOARD");
+        pageTitle.setText("CHATROOM");
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LoginActivity.mGoogleSignInClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        FirebaseAuth.getInstance().signOut();
-                        Intent intent = new Intent(ChatRoomActivity.this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                });
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(ChatRoomActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+//                LoginActivity.mGoogleSignInClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<Void> task) {
+//                        FirebaseAuth.getInstance().signOut();
+//
+//                    }
+//                });
             }
         });
         ImageView profileImage = action.getCustomView().findViewById(R.id.iv_profile_photo);

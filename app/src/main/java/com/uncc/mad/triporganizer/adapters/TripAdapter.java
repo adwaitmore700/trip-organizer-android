@@ -69,32 +69,32 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripVIewHolder
         holder.memberCount.setText(size.toString());
         Picasso.get().load(t1.getTripImageUrl()).into(holder.tripImage);
 
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(final View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-                builder.setMessage("Are you sure you want to delete ?").setTitle("Delete Trip")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                deleteTrip(t1.getId(),position);
-                                Toast.makeText(view.getContext(), "Trip Deleted", Toast.LENGTH_SHORT).show();
-
-                            }
-                        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.cancel();
-                    }
-                });
-               AlertDialog alert = builder.create();
-               if(FirebaseAuth.getInstance().getCurrentUser().getUid().equals(t1.getAdminId()))
-                alert.show();
-               else
-                   Toast.makeText(view.getContext(), "You can't delete this trip.", Toast.LENGTH_SHORT).show();
-                return false;
-            }
-        });
+//        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(final View view) {
+//                AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+//                builder.setMessage("Are you sure you want to delete ?").setTitle("Delete Trip")
+//                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialogInterface, int i) {
+//                                deleteTrip(t1.getId(),position);
+//                                Toast.makeText(view.getContext(), "Trip Deleted", Toast.LENGTH_SHORT).show();
+//
+//                            }
+//                        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        dialogInterface.cancel();
+//                    }
+//                });
+//               AlertDialog alert = builder.create();
+//               if(FirebaseAuth.getInstance().getCurrentUser().getUid().equals(t1.getAdminId()))
+//                alert.show();
+//               else
+//                   Toast.makeText(view.getContext(), "You can't delete this trip.", Toast.LENGTH_SHORT).show();
+//                return false;
+//            }
+//        });
 
 //        holder.joinLeaveBtn.setOnClickListener(new View.OnClickListener() {
 //            @Override

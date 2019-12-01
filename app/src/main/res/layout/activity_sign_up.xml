@@ -15,7 +15,7 @@
         android:background="@drawable/blue_themed_gradient"
         android:text="@string/btn_singUp_text"
         android:textAllCaps="false"
-        android:textColor="@color/primaryDarkColor"
+        android:textColor="@android:color/black"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

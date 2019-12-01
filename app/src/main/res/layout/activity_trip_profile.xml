@@ -8,24 +8,33 @@
     tools:context=".activities.TripProfileActivity">
 
 
+    <TextView
+        android:id="@+id/takePhotoInstruction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/upload_image_label_text"
+        app:layout_constraintBottom_toBottomOf="@+id/tripImage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/tripImage"
+        app:layout_constraintTop_toTopOf="@+id/tripImage" />
+
     <ImageView
         android:id="@+id/tripImage"
         android:layout_width="0dp"
         android:layout_height="220dp"
         android:scaleType="fitXY"
+        android:translationZ="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/app_logo"
-        tools:srcCompat="@tools:sample/backgrounds/scenic[14]" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/tripTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
+        android:layout_marginStart="15dp"
         android:layout_marginTop="4dp"
-        android:layout_marginEnd="4dp"
+        android:layout_marginEnd="15dp"
         android:ems="10"
         android:hint="@string/triptitleLabel"
         android:inputType="textPersonName"
@@ -61,10 +70,11 @@
 
     <Button
         android:id="@+id/btnSaveTrip"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/blue_themed_gradient"
         android:text="@string/saveTrip"
         android:textAllCaps="false"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -74,9 +84,10 @@
         android:id="@+id/usersRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="15dp"
         android:layout_marginTop="4dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="10dp"
         app:layout_constraintBottom_toTopOf="@+id/btnSaveTrip"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -88,7 +99,6 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
-        android:text="TextView"
         android:textColor="@android:color/white"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="@+id/tripImage"
@@ -100,7 +110,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="15dp"
-        android:text="Chat Room"
+        android:background="@drawable/yellow_themed_gradient"
+        android:text="@string/chat_room_button_text"
         android:textAllCaps="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tripLng" />
@@ -111,7 +122,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
         android:layout_marginTop="4dp"
-        android:text="Invite Users"
+        android:background="@drawable/yellow_themed_gradient"
+        android:text="@string/invite_users_button_text"
         android:textAllCaps="false"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tripLat" />
@@ -121,8 +133,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:layout_marginTop="4dp"
-        android:text="List of users invited :"
+        android:layout_marginTop="8dp"
+        android:text="@string/invited_users_list_label_text"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/inviteUsers" />
 
@@ -130,21 +142,24 @@
         android:id="@+id/join"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
         android:layout_marginTop="4dp"
-        android:text="Join"
-        app:layout_constraintEnd_toStartOf="@+id/navigateChatRoom"
-        app:layout_constraintStart_toEndOf="@+id/inviteUsers"
+        android:background="@drawable/yellow_themed_gradient"
+        android:text="@string/join_button_text"
+        android:textAllCaps="false"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tripLat" />
 
     <Button
         android:id="@+id/deleteTrip"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:text="Delete Trip"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toEndOf="@+id/btnSaveTrip"
-        app:layout_constraintTop_toBottomOf="@+id/usersRecyclerView" />
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/blue_themed_gradient"
+        android:text="@string/delete_trip_button_text"
+        android:textAllCaps="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

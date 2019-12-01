@@ -1,5 +1,6 @@
 package com.uncc.mad.triporganizer.adapters;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,9 +23,11 @@ import java.util.ArrayList;
 
 public class AddedUserAdapter extends RecyclerView.Adapter<AddedUserAdapter.UserViewHolder> {
     public  static ArrayList<UserProfile> userList;
+    private Context context;
     Boolean addflag = true;
-    public AddedUserAdapter(ArrayList<UserProfile> userList) {
+    public AddedUserAdapter(ArrayList<UserProfile> userList, Context c) {
         this.userList = userList;
+        context = c;
     }
 
     @NonNull
@@ -40,7 +43,12 @@ public class AddedUserAdapter extends RecyclerView.Adapter<AddedUserAdapter.User
     public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
         final UserProfile u1 = userList.get(position);
         holder.userListFullName.setText(u1.getFirstName()+" " + u1.getLastName());
-        Picasso.get().load(u1.getImageUrl()).into(holder.userphoto);
+        if (u1.getImageUrl() == null || u1.getImageUrl() == "") {
+            holder.userphoto.setImageDrawable(context.getDrawable(R.drawable.default_avatar_icon));
+        } else {
+            Picasso.get().load(u1.getImageUrl()).into(holder.userphoto);
+        }
+        //Picasso.get().load(u1.getImageUrl()).into(holder.userphoto);
     }
 
     @Override

@@ -15,7 +15,7 @@ import com.uncc.mad.triporganizer.R;
 
 //Starting point of the application, this will also be the login activity
 public class MainActivity extends AppCompatActivity {
-
+        public static GoogleSignInAccount account;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,23 +27,24 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         ProgressDialog loader = ProgressDialog.show(MainActivity.this, "", "Initializing ...", true);
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        if (currentUser == null && account == null) {
-            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-            startActivity(intent);
-            loader.dismiss();
-        } else {
-            DocumentReference docRef = FirebaseFirestore.getInstance().collection("Users").document(currentUser.getUid());
-            if (docRef == null) {
-                Intent intent = new Intent(MainActivity.this, UserProfileActivity.class);
-                startActivity(intent);
-                loader.dismiss();
-            } else {
-                Intent intent = new Intent(MainActivity.this, DashboardActivity.class);
-                startActivity(intent);
-                loader.dismiss();
-            }
-        }
+     //   GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);&& account == null
+         if(currentUser == null ){
+             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+             startActivity(intent);
+             loader.dismiss();
+         }
+         else{
+             DocumentReference docRef = FirebaseFirestore.getInstance().collection("Users").document(currentUser.getUid());
+             if (docRef == null) {
+                 Intent intent = new Intent(MainActivity.this, UserProfileActivity.class);
+                 startActivity(intent);
+                 loader.dismiss();
+             } else {
+                 Intent intent = new Intent(MainActivity.this, DashboardActivity.class);
+                 startActivity(intent);
+                 loader.dismiss();
+             }
+         }
         finish();
 //        new android.os.Handler().postDelayed(
 //                new Runnable() {
